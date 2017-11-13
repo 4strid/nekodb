@@ -10,6 +10,16 @@ test('Typeclass.getBasicType should work for basic types', function (t) {
 	t.end()
 })
 
+test('Typeclass.compareTypes should work for basic types', function (t) {
+	t.equal(Typeclass.compareTypes(String, 'fdsa'), true, 'String')
+	t.equal(Typeclass.compareTypes(Number, 123), true, 'Number')
+	t.equal(Typeclass.compareTypes(Boolean, true), true, 'Boolean')
+	t.equal(Typeclass.compareTypes(null, null), true, 'null')
+	t.equal(Typeclass.compareTypes(Date, new Date()), true, 'Date')
+	t.equal(Typeclass.compareTypes(String, 123), false, 'False for non matching element')
+	t.end()
+})
+
 test('Typeclass.compareTypes should work for arrays', function (t) {
 	t.equal(Typeclass.compareTypes([String], []), true, 'Empty array')
 	t.equal(Typeclass.compareTypes([String], ['fdsa']), true, 'Array of one element')
@@ -32,5 +42,16 @@ test('Typeclass.compareTypes should work for an array of options', function (t) 
 	t.equal(Typeclass.compareTypes([[String, Boolean]], ['fdsa', true]), true, 'Array of multiple elements')
 	t.equal(Typeclass.compareTypes([[String, Boolean]], null), false, 'False when not array')
 	t.equal(Typeclass.compareTypes([[String, Boolean]], [123]), false, 'False for incompatible elements')
+	t.end()
+})
+
+test('String typeclasses should validate correctly', function (t) {
+	t.equal(Typeclass.classes.String.check('fdsa'), true, 'Base String type')
+	t.equal(Typeclass.classes.String.check(123), false, 'Base type returns false when not a String')
+	t.equal(Typeclass.classes.String[4].check('fdsa'), true, 'Length limited String type')
+	t.equal(Typeclass.classes.String[4].check('12345'), false, 'Length limited String type returns false when too long')
+	t.equal(Typeclass.classes.String.constant('fdsa').check('fdsa'), true, 'Constant String which matches')
+	t.equal(Typeclass.classes.String.constant('fdsa').check(undefined), true, 'Constant String passed undefined')
+	t.equal(Typeclass.classes.String.constant('fdsa').check('aaaa'), false, 'Constant String which does not match')
 	t.end()
 })
