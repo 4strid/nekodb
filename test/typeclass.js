@@ -1,4 +1,5 @@
-const Typeclass = require('../lib/typeclass.js')
+const Typeclass = require('../lib/typeclass')
+//const type = require('../lib/typeclass/type')
 const test = require('tape')
 
 test('Typeclass.getBasicType should work for basic types', function (t) {
@@ -52,6 +53,20 @@ test('String typeclasses should validate correctly', function (t) {
 	t.equal(Typeclass.classes.String[4].check('12345'), false, 'Length limited String type returns false when too long')
 	t.equal(Typeclass.classes.String.constant('fdsa').check('fdsa'), true, 'Constant String which matches')
 	t.equal(Typeclass.classes.String.constant('fdsa').check(undefined), true, 'Constant String passed undefined')
+	t.equal(Typeclass.classes.String.constant('fdsa').check(null), true, 'Constant String passed null')
 	t.equal(Typeclass.classes.String.constant('fdsa').check('aaaa'), false, 'Constant String which does not match')
+	t.equal(Typeclass.classes.String.optional().check('fdsa'), true, 'Optional passed a string')
+	t.equal(Typeclass.classes.String.optional().check(null), true, 'Optional passed null')
+	t.equal(Typeclass.classes.String.optional().check(123), false, 'Optional passed non matching value')
+	t.end()
+})
+
+
+test('Number typeclasses should validate correctly', function (t) {
+	t.equal(Typeclass.classes.Number.check(123), true, 'Base Number type')
+	t.equal(Typeclass.classes.Number.check('fdsa'), false, 'Base Number type returns false when not a String')
+	t.equal(Typeclass.classes.Number.min(0).check(123), true, 'Min value that passes')
+	t.equal(Typeclass.classes.Number.min(0).check(-123), false, 'Min value that does not pass')
+	t.equal(Typeclass.classes.Number.min(0).max(123).check(123), true, 'Min and Max value that passes')
 	t.end()
 })
