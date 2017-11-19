@@ -12,33 +12,11 @@ const ko = new Proxy(Object.create(prototype), {
 	}
 })
 
-function Model (name, schema) {
-	const o = Object.create(Model.prototype)
-	o.name = name
-	if (schema !== undefined) {
-		
-	}
-
-	return o
-}
-
-Model.fk_prototype = {
-
-}
-
-Model.prototype = Object.create(Model.fk_prototype)
 
 Object.assign(Model.prototype, {
 
 })
 
-
-function DummyModel (name) {
-	// 'this' refers the the db creating the model
-	const o = Object.create(Model.fk_prototype)
-	o.path = this.name + '.' + name
-	return o
-}
 
 function Models (db) {
 

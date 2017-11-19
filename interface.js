@@ -2,24 +2,14 @@ const ko = require('kodbm')
 
 ko.models({
 	users: {
-		//username: /^[a-zA-Z0-9_\-\.~[\]@!$'()\*+;,= ]{2,20}$/,
+		//username: 
 		//password: ,
 		//email: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
-		//name: /.{2-30}/,
-		username: ko.String[25],
-		password: ko.String[100],
+		name: ko.String[50],
+		username: ko.String[25].match(/^[a-zA-Z0-9_\-\.~[\]@!$'()\*+;,= ]{2,20}$/),
+		password: ko.String[50], // this is the password before it's transformed
 		email: ko.Email,
 		searchname: ko.String[100],
-		$$validate: {
-			username: {
-				rule: /^[a-zA-Z0-9_\-\.~[\]@!$'()\*+;,= ]{2,20}$/,
-				message: 'Try a different username'
-			},
-			password: {
-				rule: /.{8,}/,
-				message: 'Must be at least 8 characters long'
-			}
-		}
 	},
 	hosts: {
 		hostname: ko.String[100],
@@ -27,6 +17,46 @@ ko.models({
 		admins: [ko.models.users.key['username']]
 	}
 })
+
+const newUser = ko.models.user.create({
+	name: 'whatever',
+	username: 'whatever',
+	whatever: 'etc',
+})
+
+newUser.save()
+
+// where's the benefit?
+
+ko.models.user.insert({
+	name: 'whatever',
+	username: 'whatever',
+	whatever: 'etc',
+})
+
+// or better yet
+
+ko.models.user.insert($.body).then(function (inserted) {
+	// nice
+})
+
+// consider
+
+ko.models.user.findOne({username: /username/i}).then(function (user) {
+	user.password = newPassword
+	return user.save()
+})
+// that's way better than doing it by hand
+ko.models.user.update({username: /username/i}, {}, {password: {$set: newPassword}})
+
+
+
+
+
+
+
+
+
 
 ko.feszbook.models({
 	user,
@@ -37,7 +67,7 @@ ko.feszbook.models({
 	post: {
 		author: ko.models.user,
 		family: ko.models.family,
-		date: ko.Date.now
+		date: ko.Date.now,
 		content: ko.contentblocks.models.content.embed
 	},
 	photo: {
@@ -125,8 +155,8 @@ app.route('/db/manage', auth.ensureLoggedIn, permissions.isAdmin, db.routes.mana
 app.route('/api/penpal', db.routes.penpal.post)
 
 app.get('/vid', function ($) {
-	db.models.youtube.find({}, function (err, docs) {
-		$.data.videos = docs
+	db.models.youtube.find({}).then(function (videos) {
+		$.data.videos = videos
 		$.html()
 		$.end()
 	})
