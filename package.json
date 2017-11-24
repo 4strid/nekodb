@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/cutejs/kodm#readme",
   "devDependencies": {
+    "nedb": "^1.8.0",
     "tape": "^4.8.0"
   }
 }
