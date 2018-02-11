@@ -36,3 +36,14 @@ test('Number typetypes should validate correctly', function (t) {
 	t.equal(Typeclass.types.Number.min(0).max(123).check(123), true, 'Min and Max value that passes')
 	t.end()
 })
+
+test('Embedded documents should validate correctly', function (t) {
+	const documentType = Typeclass.types.Document({
+		name: Typeclass.types.String,
+		age: Typeclass.types.Number
+	})
+	t.equal(documentType.check({name: 'John', age: 250}), true, 'Matching subdocument type')
+	t.equal(documentType.check({name: 250, age: 'John'}), false, 'Incompatible subdocument types')
+	t.equal(documentType.check({foo: 'bar'}), false, 'Incompatible subdocument properties')
+	t.end()
+})

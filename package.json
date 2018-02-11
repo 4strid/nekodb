@@ -1,6 +1,6 @@
 {
   "name": "kodbm",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Tiny Database Manager for MongoDB/NeDB",
   "main": "ko.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cutejs/kodm.git"
+    "url": "git+https://github.com/cutejs/kodbm.git"
   },
   "keywords": [
     "database",
@@ -24,9 +24,9 @@
   "author": "Peter Fesz-Nguyen",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cutejs/kodm/issues"
+    "url": "https://github.com/cutejs/kodbm/issues"
   },
-  "homepage": "https://github.com/cutejs/kodm#readme",
+  "homepage": "https://github.com/cutejs/kodbm#readme",
   "devDependencies": {
     "nedb": "^1.8.0",
     "tape": "^4.8.0"
