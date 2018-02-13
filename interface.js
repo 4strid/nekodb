@@ -6,7 +6,7 @@ ko.models({
 		//password: ,
 		//email: /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
 		name: ko.String[50],
-		username: ko.String[25].match(/^[a-zA-Z0-9_\-\.~[\]@!$'()\*+;,= ]{2,20}$/),
+		username: ko.String[20].match(/^[a-zA-Z0-9_\-\.~[\]@!$'()\*+;,= ]{2,20}$/),
 		password: ko.String[50], // this is the password before it's transformed
 		email: ko.Email,
 		searchname: ko.String[100],

@@ -35,6 +35,17 @@ ko.models.user.find({}).then(function (users) {
 
 ```
 
+Validators
+----------
+```javascript
+ko.models({
+	user: {
+		name: ko.String[50], // max length of 50 characters
+		username: ko.String[20].match(/^[a-zA-Z0-9_\-\.~[\]@!$'()\*+;,= ]{2,20}$/),
+	}
+})
+```
+
 
 
 Consider this fairly early alpha quality code, suitable only for use in personal projects.

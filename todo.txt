@@ -1,15 +1,22 @@
 FEATURES:
-- Actually support MongoDB
+* Actually support MongoDB
 - Add remaining database methods
-- Typeclass validators should return promises
+- Typeclass validators should return promises (... this would basically require a complete rewrite)
 - More relationships: backreferences etc.
-- More built in typeclasses (ko.Email, ko.URL ko.Date ko.Boolean)
-- More validators ko.Number.range(min, max), ko.String.match(regex)
+- Traps (hooks)
+- model.join() -- resolves all references to their actual documents
+* support cursor
+- namespacing
+- supply a filepath to specify where to stick the db files for nedb
 
 CODE HEALTH:
 - consistently use arrow functions
 - add more tests
+- type checking when registering models and validators
+- jsdoc comments
+- update README
 - rewrite the whole thing now that we have a better understanding of what all the pieces need to do
 
 EVENTUALLY:
 - migrations
+- realtime
