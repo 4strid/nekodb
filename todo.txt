@@ -2,8 +2,14 @@ FEATURES:
 - Actually support MongoDB
 - Add remaining database methods
 - Typeclass validators should return promises
+- More relationships: backreferences etc.
+- More built in typeclasses (ko.Email, ko.URL ko.Date ko.Boolean)
+- More validators ko.Number.range(min, max), ko.String.match(regex)
 
 CODE HEALTH:
 - consistently use arrow functions
 - add more tests
 - rewrite the whole thing now that we have a better understanding of what all the pieces need to do
+
+EVENTUALLY:
+- migrations

@@ -26,22 +26,6 @@ const newUser = ko.models.user.create({
 
 newUser.save()
 
-// where's the benefit?
-
-ko.models.user.insert({
-	name: 'whatever',
-	username: 'whatever',
-	whatever: 'etc',
-})
-
-// or better yet
-
-ko.models.user.insert($.body).then(function (inserted) {
-	// nice
-})
-
-// consider
-
 ko.models.user.findOne({username: /username/i}).then(function (user) {
 	user.password = newPassword
 	return user.save()
