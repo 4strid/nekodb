@@ -1,0 +1,9 @@
+FEATURES:
+- Actually support MongoDB
+- Add remaining database methods
+- Typeclass validators should return promises
+
+CODE HEALTH:
+- consistently use arrow functions
+- add more tests
+- rewrite the whole thing now that we have a better understanding of what all the pieces need to do
