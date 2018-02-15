@@ -26,9 +26,6 @@ test('String typetypes should validate correctly', function (t) {
 	Typeclass.types.String[4].check('12345').then(valid => {
 		t.equal(valid, false, 'Length limited String type returns false when too long')
 	})
-	Typeclass.types.String[4].check('12345').then(valid => {
-		t.equal(valid, false, 'Length limited String type returns false when too long')
-	})
 	Typeclass.types.String.constant('fdsa').check('fdsa').then(valid => {
 		t.equal(valid, true, 'Constant String which matches')
 	})

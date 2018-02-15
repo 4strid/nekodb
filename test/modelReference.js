@@ -1,26 +1,7 @@
-const path = require('path')
-const fs = require('fs')
-const promisify = require('util').promisify
-const unlink = promisify(fs.unlink)
-
 const test = require('tape')
+const deleteTestFiles = require('./utils').deleteTestFiles
 
-fs.readdir(path.join(__dirname, '../db'), (err, files) => {
-	const deleteFiles = files
-							.filter(file => file.startsWith('ko_db_test'))
-							.map(file => unlink(path.join(__dirname, '../db', file)))
-
-	Promise.all(deleteFiles).then(runTests)
-})
-
-test.onFinish(() => {
-	fs.readdir(path.join(__dirname, '../db'), (err, files) => {
-		files
-			.filter(file => file.startsWith('ko_db_test'))
-			.forEach(file => unlink(path.join(__dirname, '../db', file)))
-	})
-})
-
+runTests()
 
 function runTests () {
 	const ko = require('../ko')

@@ -51,3 +51,5 @@ ko.models({
 Consider this fairly early alpha quality code, suitable only for use in personal projects.
 
 I'm just getting started!
+
+Bug reports, feature requests, and questions are all welcome: just open a Github issue and I'll get back to you.
