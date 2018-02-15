@@ -1,22 +1,31 @@
 FEATURES:
-* model.join([[fields]]) -- resolves all references to their actual documents
-* findOne({...}).join()
+* instance.join([[fields]]) -- resolves all references to their actual documents
+* findOne({...}).join() and find({..}).join()
 * supply a filepath to specify where to stick the db files for nedb
   - related to namespacing
-  - this will solve the problem of test files potentially intersecting with other test files
+  - this will solve the problem of test files potentially intersecting with other test files' collections
 * Actually support MongoDB
   - use MongoDB's native validation
-- Add remaining database methods
-  - indexes
-- More relationships: backreferences etc.
 * Hooks
+- ko.Model alternate method of registering models (I've found typing 'ko.models.<model name>' is pretty tiresome)
+* Indexes
+
+----------------- release 1.0 -----------------
+
+- More database methods
+  - deleteOne
+  - findOneAndUpdate
+  - findOneAndDelete
+  - findOneAndReplace
+- More relationships: backreferences etc.
+- Recursive resolution of ModelReferences (right now only Arrays of references are supported)
 - Custom error messages
 - namespacing
+- Wildcard Typeclass
 - Support model.update (with type checking)
   - could do this without implementing a full update query processor by implementing rollbacks
 
 CODE HEALTH:
-- there's no compelling reason for modelReference methods to be getters instead of just regular functions
 - consistently use arrow functions / ES6 features
 - consistently use trailing commas
 - add more tests
@@ -27,7 +36,7 @@ CODE HEALTH:
 - Typeclass validators should return promises (... this would basically require a complete rewrite)
   - Actually given how slow Promises are, should probably support a hybrid system
 - Bluebird promises are apparently much faster than native ones
-- More sane dependency chains
+- consistently use 'new' constructors for internal classes and Object.create constructors for public facing classes (it's just sort of random right now)
 - rewrite the whole thing now that we have a better understanding of how the pieces fit together
 - modularity is great, but it's possible we've broken up the code into too many files
 

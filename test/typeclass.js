@@ -13,7 +13,7 @@ test('Typeclass.getBasicType should work for basic types', function (t) {
 
 
 test('String typetypes should validate correctly', function (t) {
-	t.plan(13)
+	t.plan(12)
 	Typeclass.types.String.check('fdsa').then(valid => {
 		t.equal(valid, true, 'Base String type')
 	})

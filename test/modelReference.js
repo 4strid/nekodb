@@ -15,7 +15,7 @@ function runTests () {
 			})
 			ko.models({
 				ko_db_test_test1: {
-					ref: ko.models.ko_db_test_ref1.ref
+					ref: ko.models.ko_db_test_ref1.reference()
 				}
 			})
 			t.pass('Created models successfully')
@@ -33,7 +33,7 @@ function runTests () {
 					field: ko.String
 				},
 				ko_db_test_test2: {
-					ref: ko.models.ko_db_test_ref2.ref
+					ref: ko.models.ko_db_test_ref2.ref()
 				}
 			})
 			t.pass('Created models successfully')
@@ -51,7 +51,7 @@ function runTests () {
 					field: ko.String
 				},
 				ko_db_test_test3: {
-					ref: ko.models.ko_db_test_ref3.ref
+					ref: ko.models.ko_db_test_ref3.reference()
 				}
 			})
 			ko.models.ko_db_test_ref3.create({
@@ -93,7 +93,7 @@ function runTests () {
 				field: ko.String
 			},
 			ko_db_test_test4: {
-				ref: ko.models.ko_db_test_ref4.embed
+				ref: ko.models.ko_db_test_ref4.embed()
 			}
 		})
 		ko.models.ko_db_test_test4.validate({
@@ -130,7 +130,7 @@ function runTests () {
 				field: ko.String
 			},
 			ko_db_test_test5: {
-				ref: ko.models.ko_db_test_ref5.ref
+				ref: ko.models.ko_db_test_ref5.reference()
 			}
 		})
 		ko.models.ko_db_test_ref5.create({
@@ -149,13 +149,63 @@ function runTests () {
 		})
 	})
 
+	test('Saving works for schemas that contain references (Using ref shorthand)', function (t) {
+		ko.models({
+			ko_db_test_ref5_1: {
+				field: ko.String
+			},
+			ko_db_test_test5_1: {
+				ref: ko.models.ko_db_test_ref5_1.ref()
+			}
+		})
+		ko.models.ko_db_test_ref5_1.create({
+			field: 'value'
+		}).save().then(ref => {
+			return ko.models.ko_db_test_test5_1.create({
+				ref: ref._id
+			}).save()
+		})
+		.then(doc => {
+			t.pass('Successfully created document')
+			t.end()
+		}).catch(err => {
+			t.error(err, 'Failed to save the document')
+			t.end()
+		})
+	})
+
+	test('Saving works for schemas that contain references (using Model shorthand)', function (t) {
+		ko.models({
+			ko_db_test_ref5_2: {
+				field: ko.String
+			},
+			ko_db_test_test5_2: {
+				ref: ko.models.ko_db_test_ref5_2
+			}
+		})
+		ko.models.ko_db_test_ref5_2.create({
+			field: 'value'
+		}).save().then(ref => {
+			return ko.models.ko_db_test_test5_2.create({
+				ref: ref._id
+			}).save()
+		})
+		.then(doc => {
+			t.pass('Successfully created document')
+			t.end()
+		}).catch(err => {
+			t.error(err, 'Failed to save the document')
+			t.end()
+		})
+	})
+
 	test('Saving works for schemas that contain embedded references', function (t) {
 		ko.models({
 			ko_db_test_ref6: {
 				field: ko.String
 			},
 			ko_db_test_test6: {
-				ref: ko.models.ko_db_test_ref6.embed
+				ref: ko.models.ko_db_test_ref6.embed()
 			}
 		})
 		ko.models.ko_db_test_test6.create({
