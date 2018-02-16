@@ -1,5 +1,4 @@
 const test = require('tape')
-const deleteTestFiles = require('./utils').deleteTestFiles
 
 let ko
 let Instance
@@ -12,15 +11,15 @@ function setup () {
 	Instance = require('../lib/models/instance')
 
 	ko.models({
-		test: {}
+		ko_db_test_cursor: {}
 	})
 
 	Promise.all([
-		ko.models.test.create({_id: 0}),
-		ko.models.test.create({_id: 1}),
-		ko.models.test.create({_id: 2}),
-		ko.models.test.create({_id: 3}),
-		ko.models.test.create({_id: 4}),
+		ko.models.ko_db_test_cursor.create({_id: 0}),
+		ko.models.ko_db_test_cursor.create({_id: 1}),
+		ko.models.ko_db_test_cursor.create({_id: 2}),
+		ko.models.ko_db_test_cursor.create({_id: 3}),
+		ko.models.ko_db_test_cursor.create({_id: 4}),
 	].map(doc => doc.save())).then(runTests).catch(err => {
 		console.error(err)
 	})
@@ -28,7 +27,7 @@ function setup () {
 
 function runTests () {
 	test('Cursor should be able to sort', function (t) {
-		const cursor = ko.models.test.find({}).sort({_id: -1}).then(docs => {
+		const cursor = ko.models.ko_db_test_cursor.find({}).sort({_id: -1}).then(docs => {
 			t.deepEqual(docs, [
 				{_id: 4},
 				{_id: 3},
@@ -44,7 +43,7 @@ function runTests () {
 	})
 
 	test('Cursor should be able to skip', function (t) {
-		const cursor = ko.models.test.find({}).sort({_id: 1}).skip(2).then(docs => {
+		const cursor = ko.models.ko_db_test_cursor.find({}).sort({_id: 1}).skip(2).then(docs => {
 			t.deepEqual(docs, [
 				{_id: 2},
 				{_id: 3},
@@ -58,7 +57,7 @@ function runTests () {
 	})
 
 	test('Cursor should be able to limit', function (t) {
-		const cursor = ko.models.test.find({}).sort({_id: 1}).limit(1).then(docs => {
+		const cursor = ko.models.ko_db_test_cursor.find({}).sort({_id: 1}).limit(1).then(docs => {
 			t.deepEqual(docs, [{_id: 0}], 'Results were limited')
 			t.equal(docs[0] instanceof Instance, true, 'Result is a Model Instance')
 			t.end()
@@ -80,7 +79,7 @@ function runTests () {
 			id++
 		}
 
-		ko.models.test.find({}).sort({_id: 1}).skip(2).limit(3).forEach(iterate)
+		ko.models.ko_db_test_cursor.find({}).sort({_id: 1}).skip(2).limit(3).forEach(iterate)
 		.catch(err => {
 			t.error(err)
 			t.end()

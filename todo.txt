@@ -1,22 +1,25 @@
 FEATURES:
 * instance.join([[fields]]) -- resolves all references to their actual documents
 * findOne({...}).join() and find({..}).join()
+* ah whoops, need to support Arrays of References
 * supply a filepath to specify where to stick the db files for nedb
   - related to namespacing
   - this will solve the problem of test files potentially intersecting with other test files' collections
 * Actually support MongoDB
   - use MongoDB's native validation
-* Hooks
+* Hooks (still have to do delete)
 - ko.Model alternate method of registering models (I've found typing 'ko.models.<model name>' is pretty tiresome)
 * Indexes
 
 ----------------- release 1.0 -----------------
 
 - More database methods
-  - deleteOne
   - findOneAndUpdate
   - findOneAndDelete
   - findOneAndReplace
+- Disallow mixing References and basic typeclasses
+- refactor tests to be more modular (so we can recycle tests between MongoDB and NeDB)
+- Have NeDBClient return results similar to MongoDB's WriteResults (the more consistency between the two clients, the better)
 - More relationships: backreferences etc.
 - Recursive resolution of ModelReferences (right now only Arrays of references are supported)
 - Custom error messages
@@ -29,8 +32,7 @@ CODE HEALTH:
 - consistently use arrow functions / ES6 features
 - consistently use trailing commas
 - add more tests
-- type checking when registering models and validators
-- use prototype instead of defineProperty to attach __model to instance
+- type checking when registering models and validators (a program that throws errors is easier to debug than one that just crashes because you fed it bad input)
 - jsdoc comments
 * write README
 - Typeclass validators should return promises (... this would basically require a complete rewrite)
