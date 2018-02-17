@@ -4,7 +4,8 @@
   "description": "Tiny Database Manager for MongoDB/NeDB",
   "main": "ko.js",
   "scripts": {
-    "test": "tape ./test/*.js"
+    "test": "tape ./test/*.js",
+    "coverage": "nyc tape ./test/*.js | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,8 @@
   "homepage": "https://github.com/cutejs/kodbm#readme",
   "devDependencies": {
     "nedb": "^1.8.0",
+    "nyc": "^11.4.1",
+    "tap-spec": "^4.1.1",
     "tape": "^4.8.0"
   },
   "dependencies": {

@@ -21,6 +21,7 @@ FEATURES:
 - refactor tests to be more modular (so we can recycle tests between MongoDB and NeDB)
 - Have NeDBClient return results similar to MongoDB's WriteResults (the more consistency between the two clients, the better)
 - More relationships: backreferences etc.
+- Support Option Array of References (not possible in current implementation)
 - Recursive resolution of ModelReferences (right now only Arrays of references are supported)
 - Custom error messages
 - namespacing

@@ -1,5 +1,4 @@
 const test = require('tape')
-const deleteTestFiles = require('./utils').deleteTestFiles
 
 runTests()
 
