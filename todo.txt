@@ -1,15 +1,13 @@
 FEATURES:
-* instance.join([[fields]]) -- resolves all references to their actual documents
-* findOne({...}).join() and find({..}).join()
-* ah whoops, need to support Arrays of References
+* saveRefs
 * supply a filepath to specify where to stick the db files for nedb
   - related to namespacing
   - this will solve the problem of test files potentially intersecting with other test files' collections
 * Actually support MongoDB
-  - use MongoDB's native validation
+  - Support "magic" async (no waiting for connect to finish)
 * Hooks (still have to do delete)
-- ko.Model alternate method of registering models (I've found typing 'ko.models.<model name>' is pretty tiresome)
 * Indexes
+* Only allow Array of references (throw errors if too complex) 
 
 ----------------- release 1.0 -----------------
 
@@ -17,12 +15,12 @@ FEATURES:
   - findOneAndUpdate
   - findOneAndDelete
   - findOneAndReplace
-- Disallow mixing References and basic typeclasses
+- use MongoDB's native validation
 - refactor tests to be more modular (so we can recycle tests between MongoDB and NeDB)
 - Have NeDBClient return results similar to MongoDB's WriteResults (the more consistency between the two clients, the better)
 - More relationships: backreferences etc.
-- Support Option Array of References (not possible in current implementation)
-- Recursive resolution of ModelReferences (right now only Arrays of references are supported)
+- Support Option of References (not possible in current implementation)
+- Disallow mixing References and basic typeclasses
 - Custom error messages
 - namespacing
 - Wildcard Typeclass

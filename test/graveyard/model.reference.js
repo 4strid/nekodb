@@ -197,32 +197,5 @@ function runTests () {
 			t.end()
 		})
 	})
-
-	test('Saving works for schemas that contain embedded references', function (t) {
-		ko.models({
-			ko_db_test_ref6: {
-				field: ko.String
-			},
-			ko_db_test_test6: {
-				ref: ko.models.ko_db_test_ref6.embed()
-			}
-		})
-		ko.models.ko_db_test_test6.create({
-			ref: {
-				field: 'In the database'
-			}
-		}).save().then(doc => {
-			t.pass('Successfully created document')
-			t.equal('_id' in doc.ref, true, 'Embedded document received an id')
-			return ko.models.ko_db_test_ref6.count({_id: doc.ref._id})
-		})
-		.then(count => {
-			t.equal(count, 1, 'Embedded document was saved to the database')
-			t.end()
-		}).catch(err => {
-			t.error(err, 'Failed to save the document')
-			t.end()
-		})
-	})
 }
 
