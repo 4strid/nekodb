@@ -2,6 +2,7 @@ const test = require('tape')
 
 const ko = require('../ko')
 
+const Instance = require('../lib/models/instance')
 
 
 test('Saving a new simple model successfully', function (t) {
@@ -84,10 +85,82 @@ test('Saving a simple model unsuccessfully', function (t) {
 		t.fail('Model creation succeeded where it should have failed')
 		return SimpleModelFail.count({})
 	}).catch(err => {
-		t.equal(err instanceof Error, true, 'Got back an error')
+		t.equal(err instanceof Error, true, 'Got back an error when creating a duplicate')
 		return SimpleModelFail.count({})
 	}).then(count => {
 		t.equal(count, 1, 'Did not add anything to the database')
+		t.end()
+	})
+})
+
+test('Saving a model with a reference', function (t) {
+	const ReferencedModel = ko.Model('ko_db_test_save_referenced', {
+		string: ko.String
+	})
+
+	const ModelWithRef = ko.Model('ko_db_test_save_with_ref', {
+		field: ko.String,
+		ref: ReferencedModel
+	})
+
+	ReferencedModel.create({
+		_id: '0',
+		string: 'hello'
+	}).save().then(() => {
+		return ModelWithRef.create({
+			_id: '0',
+			field: 'zzz',
+			ref: '0'
+		}).save()
+	}).then(saved => {
+		t.deepEqual(saved, {
+			_id: '0',
+			field: 'zzz',
+			ref: '0',
+		}, 'Got back the saved model')
+		return ModelWithRef.count({})
+	}).then(count => {
+		t.equal(count, 1, 'Saved document to the database')
+		return ModelWithRef.findOne({_id: '0'})
+	}).then(model => {
+		model.field = 'yyy'
+		return model.save()
+	}).then(() => {
+		return ModelWithRef.findOne({_id: '0'})
+	}).then(model => {
+		t.equal(model.field, 'yyy', 'Document was updated')
+		return ModelWithRef.findOne({_id: '0'}).join()
+	}).then(model => {
+		model.field = 'xxx'
+		return model.save()
+	}).then(model => {
+		return ModelWithRef.findOne({_id: '0'})
+	}).then(model => {
+		t.equal(model.field, 'xxx', 'Document was saved after a join')
+		return ModelWithRef.create({
+			_id: '1',
+			field: 'aaa',
+			ref: {
+				_id: '1',
+				string: 'goodbye'
+			}
+		}).saveRefs()
+	}).then(model => {
+		return model.save()
+	}).then(() => {
+		return ReferencedModel.count({})
+	}).then(count => {
+		t.equal(count, 2, 'Saved reference to the database')
+		return ModelWithRef.findOne({_id: '1'})
+	}).then(model => {
+		t.deepEqual(model, {
+			_id: '1',
+			field: 'aaa',
+			ref: '1'
+		}, 'Saved document to the database')
+		t.end()
+	}).catch(err => {
+		t.error(err)
 		t.end()
 	})
 })
@@ -116,30 +189,6 @@ test('Saving works for schemas that contain embedded references', function (t) {
 		t.end()
 	})
 })
-
-//test('Saving a model with a reference', function (t) {
-	//const ReferencedModel = ko.Model('ko_db_test_save_referenced', {
-		//string: ko.String
-	//})
-
-	//const ModelWithRef = ko.Model('ko_db_test_save_with_ref', {
-		//field: ko.String,
-		//ref: ReferencedModel
-	//})
-
-	//ReferencedModel.create({
-		//_id: '0',
-		//string: 'hello'
-	//}).save().then(() => {
-		//return ModelWithRef.create({
-			//_id: '0',
-			//field: 'zzz',
-			//ref: '0'
-		//}).save()
-	//}).then(saved => {
-		//t.end()
-	//})
-//})
 
 // saving a model with a ref
 // updating a model with a ref
