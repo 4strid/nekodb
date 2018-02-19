@@ -1,5 +1,4 @@
 FEATURES:
-* saveRefs
 * supply a filepath to specify where to stick the db files for nedb
   - related to namespacing
   - this will solve the problem of test files potentially intersecting with other test files' collections
@@ -10,7 +9,6 @@ FEATURES:
 * Only allow Array of references (throw errors if too complex) 
 
 ----------------- release 1.0 -----------------
-
 - More database methods
   - findOneAndUpdate
   - findOneAndDelete
@@ -28,7 +26,8 @@ FEATURES:
   - could do this without implementing a full update query processor by implementing rollbacks
 
 CODE HEALTH:
-- consistently use arrow functions / ES6 features
+- consistently use arrow functions
+- use async/await
 - consistently use trailing commas
 - add more tests
 - type checking when registering models and validators (a program that throws errors is easier to debug than one that just crashes because you fed it bad input)
@@ -39,6 +38,7 @@ CODE HEALTH:
 - Bluebird promises are apparently much faster than native ones
 - consistently use 'new' constructors for internal classes and Object.create constructors for public facing classes (it's just sort of random right now)
 - rewrite the whole thing now that we have a better understanding of how the pieces fit together
+  - importantly: More elegantly deal with references (all in one place and not just sporadically where needed)
 - modularity is great, but it's possible we've broken up the code into too many files
 
 EVENTUALLY:

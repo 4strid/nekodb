@@ -25,7 +25,7 @@ function deleteTestFiles (cb) {
 }
 
 module.exports = {
-	deleteTestFiles
+	deleteTestFiles,
 }
 
 test.onFinish(deleteTestFiles)
