@@ -81,7 +81,8 @@ test('Saving a simple model unsuccessfully', function (t) {
 			string: 'ok',
 			number: 123
 		}).save()
-	}).then(() => {
+	}).then(model => {
+		console.log(model)
 		t.fail('Model creation succeeded where it should have failed')
 		return SimpleModelFail.count({})
 	}).catch(err => {
@@ -144,10 +145,9 @@ test('Saving a model with a reference', function (t) {
 				_id: '1',
 				string: 'goodbye'
 			}
-		}).saveRefs()
-	}).then(model => {
-		return model.save()
+		}).saveAll()
 	}).then(() => {
+		t.pass('Created reference and document together')
 		return ReferencedModel.count({})
 	}).then(count => {
 		t.equal(count, 2, 'Saved reference to the database')
@@ -158,6 +158,17 @@ test('Saving a model with a reference', function (t) {
 			field: 'aaa',
 			ref: '1'
 		}, 'Saved document to the database')
+		return model.join()
+	}).then(model => {
+		model.ref.string = 'konnichi wa'
+		return model.saveRefs()
+	}).then(() => {
+		return ReferencedModel.findOne({_id: '1'})
+	}).then(reference => {
+		t.deepEqual(reference, {
+			_id: '1',
+			string: 'konnichi wa'
+		}, 'Updated reference')
 		t.end()
 	}).catch(err => {
 		t.error(err)
@@ -165,19 +176,19 @@ test('Saving a model with a reference', function (t) {
 	})
 })
 
-test('Saving works for schemas that contain embedded references', function (t) {
+test('Saving a model with an embedded reference', function (t) {
 	const EmbeddedModel = ko.Model('ko_db_test_save_embedded', {
 		string: ko.String
 	})
 
 	const EmbedModel = ko.Model('ko_db_test_save_embed', {
-		ref: EmbeddedModel
+		ref: EmbeddedModel.embed()
 	})
 	EmbedModel.create({
 		ref: {
 			string: 'In the database'
 		}
-	}).saveRefs().then(doc => {
+	}).saveAll().then(doc => {
 		t.equal(typeof doc.ref._id, 'string', 'Embedded document received an id')
 		return EmbeddedModel.count({_id: doc.ref._id})
 	})
@@ -189,9 +200,3 @@ test('Saving works for schemas that contain embedded references', function (t) {
 		t.end()
 	})
 })
-
-// saving a model with a ref
-// updating a model with a ref
-
-// saving a model that has been joined
-// updating the referenced model after a join
