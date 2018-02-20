@@ -220,8 +220,43 @@ test('Saving a model with an embedded reference', function (t) {
 	})
 })
 
-test.only('Saving a model with an array of references', function (t) {
-	const ReferencedModel = ko.Model('ko_db_test_save_referenced2', {
+test('Saving a model with an embed only reference', function (t) {
+	const EmbeddedModel = ko.Model('ko_db_test_save_embedded_only', {
+		string: ko.String,
+	})
+
+	const EmbedModel = ko.Model('ko_db_test_save_embed_only', {
+		ref: EmbeddedModel.embedOnly(),
+	})
+	EmbedModel.create({
+		_id: 0,
+		ref: {
+			string: 'Not in the database',
+		},
+	}).saveAll().then(doc => {
+		t.pass('Created document and embedded reference together')
+		t.equal(typeof doc.ref._id, 'undefined', 'Embedded document did not receive an id')
+		return EmbeddedModel.count({})
+	}).then(count => {
+		t.equal(count, 0, 'Embedded document was not saved to the database')
+		return EmbedModel.findOne({_id: 0})
+	}).then(model => {
+		model.ref.string = 'Still not in the database'
+		return model.saveAll()
+	}).then(model => {
+		t.equal(model.ref.string, 'Still not in the database', 'Updated document')
+		return EmbeddedModel.count({})
+	}).then(count => {
+		t.equal(count, 0, 'Embedded document was not saved to the database')
+		t.end()
+	}).catch(err => {
+		t.error(err, 'Failed to save the document')
+		t.end()
+	})
+})
+
+test('Saving a model with an array of references', function (t) {
+	const ReferencedModel = ko.Model('ko_db_test_save_arr_referenced', {
 		string: ko.String,
 	})
 
@@ -325,3 +360,138 @@ test.only('Saving a model with an array of references', function (t) {
 	})
 })
 
+test('Saving a model with an array of embedded references', function (t) {
+	const EmbeddedModel = ko.Model('ko_db_test_save_arr_embedded', {
+		string: ko.String,
+	})
+
+	const EmbedModel = ko.Model('ko_db_test_save_arr_embed', {
+		name: ko.String,
+		refs: [EmbeddedModel.embed()],
+	})
+
+	EmbedModel.create({
+		name: 'xyz',
+		refs: [{
+			string: '1',
+		}, {
+			string: '2',
+		}],
+	}).saveAll().then(saved => {
+		t.pass('Created a document and embedded references together')
+		t.equal(typeof saved._id, 'string', 'Document received an ID')
+		t.equal(typeof saved.refs[0]._id, 'string', 'Reference received an ID')
+		t.equal(typeof saved.refs[1]._id, 'string', 'Reference received an ID')
+		t.deepEqual(saved, {
+			_id: saved._id,
+			name: 'xyz',
+			refs: [{
+				_id: saved.refs[0]._id,
+				string: '1',
+			}, {
+				_id: saved.refs[1]._id,
+				string: '2',
+			}],
+		}, 'Saved document contained correct data')
+		return EmbedModel.count({})
+	}).then(count => {
+		t.equal(count, 1, 'Saved document to database')
+		return EmbeddedModel.count({})
+	}).then(count => {
+		t.equal(count, 2, 'Saved references to database')
+		return EmbedModel.create({
+			_id: 0,
+			name: 'zzz',
+			refs: [{
+				_id: 0,
+				string: '3',
+			}, {
+				_id: 1,
+				string: '4',
+			}],
+		}).saveAll()
+	}).then(saved => {
+		t.pass('Created a document and embedded references together')
+		t.deepEqual(saved, {
+			_id: 0,
+			name: 'zzz',
+			refs: [{
+				_id: 0,
+				string: '3',
+			}, {
+				_id: 1,
+				string: '4',
+			}],
+		}, 'Saved document contained correct data')
+		return EmbedModel.count({})
+	}).then(count => {
+		t.equal(count, 2, 'Saved document to database')
+		return EmbeddedModel.count({})
+	}).then(count => {
+		t.equal(count, 4, 'Saved references to database')
+		return EmbedModel.findOne({_id: 0})
+	}).then(model => {
+		model.refs[1].string = '5'
+		return model.saveRefs()
+	}).then(() => {
+		return EmbeddedModel.findOne({_id: 1})
+	}).then(ref => {
+		t.equal(ref.string, '5', 'Embedded document was updated')
+		t.end()
+	}).catch(err => {
+		t.error(err)
+		t.end()
+	})
+})
+
+test('Saving a model with an array of embed only references', function (t) {
+	const EmbeddedModel = ko.Model('ko_db_test_save_arr_embedded_only', {
+		string: ko.String,
+	})
+
+	const EmbedModel = ko.Model('ko_db_test_save_arr_embed_only', {
+		name: ko.String,
+		refs: [EmbeddedModel.embedOnly()],
+	})
+
+	EmbedModel.create({
+		name: 'xyz',
+		refs: [{
+			string: '1',
+		}, {
+			string: '2',
+		}],
+	}).saveAll().then(saved => {
+		t.pass('Created a document and embedded references together')
+		t.equal(typeof saved._id, 'string', 'Document received an ID')
+		t.equal(typeof saved.refs[0]._id, 'undefined', 'Reference did not receive an ID')
+		t.equal(typeof saved.refs[1]._id, 'undefined', 'Reference did not receive an ID')
+		t.deepEqual(saved, {
+			_id: saved._id,
+			name: 'xyz',
+			refs: [{
+				string: '1',
+			}, {
+				string: '2',
+			}],
+		}, 'Saved document contained correct data')
+		return EmbedModel.count({})
+	}).then(count => {
+		t.equal(count, 1, 'Saved document to database')
+		return EmbeddedModel.count({})
+	}).then(count => {
+		t.equal(count, 0, 'Saved references to database')
+		return EmbedModel.findOne({name: 'xyz'})
+	}).then(model => {
+		model.refs[1].string = '5'
+		return model.save()
+	}).then(() => {
+		return EmbedModel.findOne({name: 'xyz'})
+	}).then(model => {
+		t.equal(model.refs[1].string, '5', 'Embedded document was updated')
+		t.end()
+	}).catch(err => {
+		t.error(err)
+		t.end()
+	})
+})

@@ -24,6 +24,7 @@ FEATURES:
 - Wildcard Typeclass
 - Support model.update (with type checking)
   - could do this without implementing a full update query processor by implementing rollbacks
+  - orrrrr just use Mongo's native validation
 
 CODE HEALTH:
 - consistently use arrow functions
