@@ -1,19 +1,32 @@
 const Typeclass = require('./lib/typeclass')
 const Models = require('./lib/models')
-const NeDBClient = require('./lib/client/nedb')
+const clients = require('./lib/clients')
 
 let chain = Object.create(Typeclass.types)
 
-ko = Object.create(chain)
+const ko = Object.create(chain)
 
-ko.client = NeDBClient()
+ko.Typeclass = Typeclass
+ko.Instance = Models.Instance
 
-ko.models = Models(ko.client)
+ko.connect = function (config) {
+	console.log(clients)
+	console.log(clients[config.client])
+	this.client = new clients[config.client](config)
+	console.log(this.client)
+	this.models = Models(this.client)
+	this.Model = this.models.Model
+}
 
-ko.Model = ko.models.Model
+ko.close = function () {
+	this.client.close(err => {
+		if (err) {
+			throw err
+		}
+		this.client = null
+		this.models = null
+		this.Model = null
+	})
+}
 
 module.exports = ko
-
-
-
-

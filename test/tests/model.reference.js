@@ -1,10 +1,6 @@
 const test = require('tape')
 
-runTests()
-
-function runTests () {
-	const ko = require('../ko')
-
+function runTests (ko, next) {
 	test('Model creation succeeds when schema contains references (created one at a time)', function (t) {
 		try {
 			ko.models({
@@ -197,5 +193,11 @@ function runTests () {
 			t.end()
 		})
 	})
+
+	test('All done', function (t) {
+		t.end()
+		next()
+	})
 }
 
+module.exports = runTests

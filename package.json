@@ -31,6 +31,7 @@
   "devDependencies": {
     "nedb": "^1.8.0",
     "nyc": "^11.4.1",
+    "rimraf": "^2.6.2",
     "tap-spec": "^4.1.1",
     "tape": "^4.8.0"
   },
