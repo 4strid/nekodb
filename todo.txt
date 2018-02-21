@@ -1,12 +1,12 @@
 FEATURES:
-* supply a filepath to specify where to stick the db files for nedb
-  - related to namespacing
-  - this will solve the problem of test files potentially intersecting with other test files' collections
 * Actually support MongoDB
   - Support "magic" async (no waiting for connect to finish)
 * Hooks (still have to do delete)
 * Indexes
 * Only allow Array of references (throw errors if too complex) 
+* model.count should take options
+  - since NeDB doesn't support this, maybe add it as a cursor method (which NeDB also doesn't support, but we can fake it with toArray => .length)
+* rewrite cursor.forEach
 
 ----------------- release 1.0 -----------------
 - More database methods
