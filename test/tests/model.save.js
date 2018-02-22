@@ -187,7 +187,7 @@ function runTests(ko, next) {
 			},
 		}).saveAll().then(doc => {
 			t.pass('Created document and embedded reference together')
-			t.equal(typeof doc.ref._id, 'string', 'Embedded document received an id')
+			t.equal(typeof doc.ref._id.toString(), 'string', 'Embedded document received an id')
 			return EmbeddedModel.count({_id: doc.ref._id})
 		})
 		.then(count => {
@@ -377,9 +377,9 @@ function runTests(ko, next) {
 			}],
 		}).saveAll().then(saved => {
 			t.pass('Created a document and embedded references together')
-			t.equal(typeof saved._id, 'string', 'Document received an ID')
-			t.equal(typeof saved.refs[0]._id, 'string', 'Reference received an ID')
-			t.equal(typeof saved.refs[1]._id, 'string', 'Reference received an ID')
+			t.equal(typeof saved._id.toString(), 'string', 'Document received an ID')
+			t.equal(typeof saved.refs[0]._id.toString(), 'string', 'Reference received an ID')
+			t.equal(typeof saved.refs[1]._id.toString(), 'string', 'Reference received an ID')
 			t.deepEqual(saved, {
 				_id: saved._id,
 				name: 'xyz',
@@ -461,7 +461,7 @@ function runTests(ko, next) {
 			}],
 		}).saveAll().then(saved => {
 			t.pass('Created a document and embedded references together')
-			t.equal(typeof saved._id, 'string', 'Document received an ID')
+			t.equal(typeof saved._id.toString(), 'string', 'Document received an ID')
 			t.equal(typeof saved.refs[0]._id, 'undefined', 'Reference did not receive an ID')
 			t.equal(typeof saved.refs[1]._id, 'undefined', 'Reference did not receive an ID')
 			t.deepEqual(saved, {

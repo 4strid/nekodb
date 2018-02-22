@@ -11,6 +11,8 @@ const reference = require('./tests/model.reference')
 const join = require('./tests/model.join')
 const cursor = require('./tests/cursor')
 
+const config = require('./config')
+
 function runTests (next) {
 	typeclass(ko, () => {
 		methods(ko, () => {
@@ -28,18 +30,39 @@ function runTests (next) {
 }
 
 // run tests for each client
-ko.connect({
-	client: 'nedb',
-	inMemory: true,
-})
+//ko.connect({
+	//client: 'nedb',
+	//inMemory: true,
+//})
 
-runTests(() => {
-	ko.close()
+//runTests(() => {
+	//ko.close()
+	//ko.connect({
+		//client: 'nedb',
+		//filepath: path.join(__dirname, 'db')
+	//})
+	//runTests(() => {
+		//rmrf(path.join(__dirname, 'db'), () => {})
+	//})
+//})
+
+if (config.testMongo) {
 	ko.connect({
-		client: 'nedb',
-		filepath: path.join(__dirname, 'db')
+		client: 'mongodb',
+		username: config.username,
+		password: config.password,
+		address: config.address,
+		database: config.database,
+	}, () => {
+		runTests(() => {
+			ko.client.client.db(config.database).dropDatabase().then(() => {
+				ko.close(err => {
+					if (err) {
+						console.error('couldn\'t close')
+						console.error(err)
+					}
+				})
+			})
+		})
 	})
-	runTests(() => {
-		rmrf(path.join(__dirname, 'db'), () => {})
-	})
-})
+}

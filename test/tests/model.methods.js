@@ -22,6 +22,7 @@ function runTests (ko, next) {
 		}).catch(err => {
 			t.error(err)
 			t.end()
+			next()
 		})
 	})
 
