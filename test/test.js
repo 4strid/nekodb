@@ -46,6 +46,27 @@ function runTests (next) {
 	//})
 //})
 
+//if (config.testMongo) {
+	//ko.connect({
+		//client: 'mongodb',
+		//username: config.username,
+		//password: config.password,
+		//address: config.address,
+		//database: config.database,
+	//}, () => {
+		//runTests(() => {
+			//ko.client.client.db(config.database).dropDatabase().then(() => {
+				//ko.close(err => {
+					//if (err) {
+						//console.error('couldn\'t close')
+						//console.error(err)
+					//}
+				//})
+			//})
+		//})
+	//})
+//}
+
 if (config.testMongo) {
 	ko.connect({
 		client: 'mongodb',
@@ -53,15 +74,14 @@ if (config.testMongo) {
 		password: config.password,
 		address: config.address,
 		database: config.database,
-	}, () => {
-		runTests(() => {
-			ko.client.client.db(config.database).dropDatabase().then(() => {
-				ko.close(err => {
-					if (err) {
-						console.error('couldn\'t close')
-						console.error(err)
-					}
-				})
+	})
+	runTests(() => {
+		ko.client.client.db(config.database).dropDatabase().then(() => {
+			ko.close(err => {
+				if (err) {
+					console.error('couldn\'t close')
+					console.error(err)
+				}
 			})
 		})
 	})
