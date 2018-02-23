@@ -10,10 +10,7 @@ ko.Typeclass = Typeclass
 ko.Instance = Models.Instance
 
 ko.connect = function (config, cb) {
-	console.log(clients)
-	console.log(clients[config.client])
 	this.client = new clients[config.client](config, cb)
-	console.log(this.client)
 	this.models = Models(this.client)
 	this.Model = this.models.Model
 }
