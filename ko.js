@@ -9,24 +9,17 @@ const ko = Object.create(chain)
 ko.Typeclass = Typeclass
 ko.Instance = Models.Instance
 
-ko.connect = function (config, cb) {
-	console.log(clients)
-	console.log(clients[config.client])
-	this.client = new clients[config.client](config, cb)
-	console.log(this.client)
+ko.connect = function (config) {
+	this.client = new clients[config.client](config)
 	this.models = Models(this.client)
 	this.Model = this.models.Model
 }
 
 ko.close = function () {
-	this.client.close(err => {
-		if (err) {
-			throw err
-		}
-		this.client = null
-		this.models = null
-		this.Model = null
-	})
+	this.client.close()
+	this.client = null
+	this.models = null
+	this.Model = null
 }
 
 module.exports = ko

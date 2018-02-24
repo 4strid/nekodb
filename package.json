@@ -4,7 +4,7 @@
   "description": "Tiny Database Manager for MongoDB/NeDB",
   "main": "ko.js",
   "scripts": {
-    "test": "tape ./test/*.js",
+    "test": "tape ./test/*.js | tap-spec --color",
     "coverage": "nyc tape ./test/*.js | tap-spec"
   },
   "repository": {
