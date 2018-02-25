@@ -42,12 +42,14 @@ runTests(() => {
 	})
 	runTests(() => {
 		rmrf(path.join(__dirname, 'db'), () => {})
+		ko.close()
 		if (config.testMongo) {
 			ko.connect(config)
 			bufferTests(ko, () => {
-				ko.connect(config)
 				runTests(() => {
-					ko.client.client.db(config.database).dropDatabase()
+					ko.client.client.db(config.database).dropDatabase().then(() => {
+						ko.close()
+					})
 				})
 			})
 		}

@@ -4,48 +4,42 @@ const config = require('../config')
 let refId = null
 let refsIds = null
 
-function setup (ko, next) {
-	const Ref = ko.Model('Mongodb_buffer_ref', {
-		string: ko.String,
-	})
-	const Model = ko.Model('Mongodb_buffer', {
-		name: ko.String,
-		ref: Ref,
-		refs: [Ref],
-	})
-
-	Ref.create({string: 'deleteOne'}).save().then(() => {
-		return Model.create({
-			name: '01',
-			ref: {
-				string: 'string',
-			},
-			refs: [{
-				string: 'other',
-			}],
-		}).saveAll()
-	}).then(saved => {
-		refId = saved.ref
-		refsIds = saved.refs
-		ko.close()
-		ko.connect({
-			client: 'mongodb',
-			username: config.username,
-			password: config.password,
-			address: config.address,
-			database: config.database,
-		})
-		runTests(ko, next)
-	}).catch(err => {
-		console.error(err)
-	})
-}
-
 function runTests (ko, next) {
-	console.log('hello0-0')
+	test('Setting up', function (t) {
+		const Ref = ko.Model('Mongodb_buffer_ref', {
+			string: ko.String,
+		})
+		const Model = ko.Model('Mongodb_buffer', {
+			name: ko.String,
+			ref: Ref,
+			refs: [Ref],
+		})
+
+		Ref.create({string: 'deleteOne'}).save().then(() => {
+			return Model.create({
+				name: '01',
+				ref: {
+					string: 'string',
+				},
+				refs: [{
+					string: 'other',
+				}],
+			}).saveAll()
+		}).then(saved => {
+			refId = saved.ref
+			refsIds = saved.refs
+			ko.close()
+			t.end()
+		}).catch(err => {
+			console.error(err)
+		})
+	})
+
 	test('Enqueue one of each operation', function (t) {
 		console.log('hello')
 		t.plan(6)
+
+		ko.connect(config)
 
 		const Ref = ko.Model('Mongodb_buffer_ref', {
 			string: ko.String,
@@ -120,4 +114,4 @@ function runTests (ko, next) {
 	})
 }
 
-module.exports = setup
+module.exports = runTests
