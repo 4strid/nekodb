@@ -15,7 +15,6 @@
   - orrrrr just use Mongo's native validation
 
 CODE HEALTH:
-- consistently use arrow functions
 - use async/await
 - consistently use trailing commas
 - add more tests

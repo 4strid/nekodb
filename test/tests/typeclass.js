@@ -59,6 +59,12 @@ function runTests (ko, next) {
 		valid = await ko.Number.min(0).check(-123)
 		t.equal(valid, false, 'Min value that does not pass')
 
+		valid = await ko.Number.minx(0).check(0)
+		t.equal(valid, false, 'Minx does not allow minimum value')
+
+		valid = await ko.Number.maxx(1).check(1)
+		t.equal(valid, false, 'Maxx does not allow maximum value')
+
 		valid = await ko.Number.min(0).max(123).check(123)
 		t.equal(valid, true, 'Min and Max value that passes')
 
@@ -175,7 +181,7 @@ function runTests (ko, next) {
 	test('Embedded documents should validate correctly', async function (t) {
 		const documentType = ko.Document({
 			name: ko.String,
-			age: ko.Number
+			age: ko.Number,
 		})
 		let valid = await documentType.check({name: 'John', age: 250})
 		t.equal(valid, true, 'Matching subdocument type')
@@ -185,6 +191,22 @@ function runTests (ko, next) {
 
 		valid = await documentType.check({foo: 'bar'})
 		t.equal(valid, false, 'Incompatible subdocument properties')
+		t.end()
+	})
+
+	test('Creating custom typeclasses', async function (t) {
+		const customType = ko.String.validate(function (value) {
+			return value === 'ok' || value === 'OK'
+		})
+		const extendedType = ko.String.extend(function () {
+			this.value = 'constant',
+			this.validator = value => value === 'constant'
+		})
+		t.equal(await customType.check('ok'), true, 'Custom validator passes')
+		t.equal(await customType.check('OK'), true, 'Custom validator passes')
+		t.equal(await customType.check('not ok'), false, 'Custom validator rejects non matching value')
+		t.equal(await extendedType.check('constant'), true, 'Extended validator passes')
+		t.equal(await extendedType.check('not ok'), false, 'Extended validator rejects non matching value')
 		t.end()
 	})
 

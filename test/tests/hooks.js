@@ -2,33 +2,35 @@ const test = require('tape')
 
 function runTests (ko, next) {
 	test('Hooks should run', function (t) {
-		t.plan(8)
+		// 6 * 2 for running all hooks
+		// 3 for checks
+		t.plan(15)
 		const HookModel = ko.Model('Hooks', {
 			name: ko.String,
 			$$hooks: {
-				prevalidate: function (next) {
+				prevalidate: function (instance, next) {
 					t.pass('Ran prevalidate hook')
 					next()
 				},
-				postvalidate: function (next) {
+				postvalidate: function (instance, next) {
 					t.pass('Ran postvalidate hook')
 					next()
 				},
-				presave: function (next) {
+				presave: function (instance, next) {
 					t.pass('Ran presave hook')
-					this.name = 'New value'
+					instance.name = 'New value'
 					next()
 				},
-				postsave: function (next) {
+				postsave: function (instance, next) {
 					t.pass('Ran postsave hook')
-					this.additionalValue = 'Added'
+					instance.additionalValue = 'Added'
 					next()
 				},
-				predelete: function (next) {
+				predelete: function (instance, next) {
 					t.pass('Ran predelete hook')
 					next()
 				},
-				postdelete: function (next) {
+				postdelete: function (instance, next) {
 					t.pass('Ran postdelete hook')
 					next()
 				},
@@ -38,14 +40,23 @@ function runTests (ko, next) {
 		HookModel.create({
 			name: 'Old value',
 		}).save().then(instance => {
-			t.equal(instance.name, 'New value', 'Changed value before saving')
+			t.equal(instance.name, 'Old value', 'restored old value after saving')
 			t.equal(instance.additionalValue, 'Added', 'Added value in postsave')
 		}).then(() => {
+			return HookModel.count({name: 'New value'})
+		}).then(count => {
+			t.equal(count, 1, 'Saved to database with changed value')
 			return HookModel.deleteOne({name: 'New value'})
 		}).then(() => {
+			return HookModel.create({
+				name: 'Value',
+			}).save()
+		}).then(() => {
+			return HookModel.deleteMany({})
+		}).then(() => {
+			t.end()
 		}).catch(err => {
 			t.error(err)
-			t.end()
 		})
 	})
 
