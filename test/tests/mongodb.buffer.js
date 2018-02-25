@@ -36,7 +36,6 @@ function runTests (ko, next) {
 	})
 
 	test('Enqueue one of each operation', function (t) {
-		console.log('hello')
 		t.plan(6)
 
 		ko.connect(config)

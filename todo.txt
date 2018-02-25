@@ -1,21 +1,9 @@
-FEATURES:
-* Actually support MongoDB
-  - Support "magic" async (no waiting for connect to finish)
-* Hooks (still have to do delete)
-* Indexes
-* Only allow Array of references (throw errors if too complex) 
-* model.count should take options
-  - since NeDB doesn't support this, maybe add it as a cursor method (which NeDB also doesn't support, but we can fake it with toArray => .length)
 * rewrite cursor.forEach
-
------------------ release 1.0 -----------------
 - More database methods
   - findOneAndUpdate
   - findOneAndDelete
   - findOneAndReplace
 - use MongoDB's native validation
-- refactor tests to be more modular (so we can recycle tests between MongoDB and NeDB)
-- Have NeDBClient return results similar to MongoDB's WriteResults (the more consistency between the two clients, the better)
 - More relationships: backreferences etc.
 - Support Option of References (not possible in current implementation)
 - Disallow mixing References and basic typeclasses
@@ -37,7 +25,6 @@ CODE HEALTH:
 - Typeclass validators should return promises (... this would basically require a complete rewrite)
   - Actually given how slow Promises are, should probably support a hybrid system
 - Bluebird promises are apparently much faster than native ones
-- consistently use 'new' constructors for internal classes and Object.create constructors for public facing classes (it's just sort of random right now)
 - rewrite the whole thing now that we have a better understanding of how the pieces fit together
   - importantly: More elegantly deal with references (all in one place and not just sporadically where needed)
 - modularity is great, but it's possible we've broken up the code into too many files
