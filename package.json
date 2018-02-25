@@ -4,12 +4,13 @@
   "description": "Tiny ODM for MongoDB/NeDB",
   "main": "ko.js",
   "scripts": {
-    "test": "tape ./test/*.js | tap-spec --color",
-    "coverage": "nyc tape ./test/*.js | tap-spec"
+    "test": "tape ./test/test.js | tap-spec",
+    "coverage": "nyc tape ./test/test.js | tap-spec",
+    "coverageHTML": "nyc report --reporter=html tape ./test/test.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cutejs/kodbm.git"
+    "url": "git+https://github.com/cutejs/nekodb.git"
   },
   "keywords": [
     "database",
@@ -25,11 +26,10 @@
   "author": "Peter Fesz-Nguyen",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cutejs/kodbm/issues"
+    "url": "https://github.com/cutejs/nekodb/issues"
   },
-  "homepage": "https://github.com/cutejs/kodbm#readme",
+  "homepage": "https://github.com/cutejs/nekodb#readme",
   "devDependencies": {
-    "nedb": "^1.8.0",
     "nyc": "^11.4.1",
     "rimraf": "^2.6.2",
     "tap-spec": "^4.1.1",
@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "isemail": "^3.1.1",
+    "nedb": "^1.8.0",
     "url-regex": "^4.1.1"
   },
   "optionalDependencies": {
