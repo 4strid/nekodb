@@ -12,131 +12,180 @@ function runTests (ko, next) {
 		t.end()
 	})
 
+	test('String typeclasses should validate correctly', async function (t) {
+		let valid = await ko.String.check('fdsa')
+		t.equal(valid, true, 'Base String type')
+			
+		valid = await ko.String.check(123)
+		t.equal(valid, false, 'Base type returns false when not a String')
 
-	test('String typetypes should validate correctly', function (t) {
-		t.plan(12)
-		Typeclass.types.String.check('fdsa').then(valid => {
-			t.equal(valid, true, 'Base String type')
-		})
-		Typeclass.types.String.check(123).then(valid => {
-			t.equal(valid, false, 'Base type returns false when not a String')
-		})
-		Typeclass.types.String[4].check('fdsa').then(valid => {
-			t.equal(valid, true, 'Length limited String type')
-		})
-		Typeclass.types.String[4].check('12345').then(valid => {
-			t.equal(valid, false, 'Length limited String type returns false when too long')
-		})
-		Typeclass.types.String.constant('fdsa').check('fdsa').then(valid => {
-			t.equal(valid, true, 'Constant String which matches')
-		})
-		Typeclass.types.String.constant('fdsa').check(undefined).then(valid => {
-			t.equal(valid, true, 'Constant String passed undefined')
-		})
-		Typeclass.types.String.constant('fdsa').check(null).then(valid => {
-			t.equal(valid, true, 'Constant String passed null')
-		})
-		Typeclass.types.String.constant('fdsa').check(null).then(valid => {
-			t.equal(valid, true, 'Constant String passed null')
-		})
-		Typeclass.types.String.constant('fdsa').check('aaaa').then(valid => {
-			t.equal(valid, false, 'Constant String which does not match')
-		})
-		Typeclass.types.String.optional().check('fdsa').then(valid => {
-			t.equal(valid, true, 'Optional passed a string')
-		})
-		Typeclass.types.String.optional().check(null).then(valid => {
-			t.equal(valid, true, 'Optional passed null')
-		})
-		Typeclass.types.String.optional().check(123).then(valid => {
-			t.equal(valid, false, 'Optional passed non matching value')
-		})
+		valid = await ko.String[4].check('fdsa')
+		t.equal(valid, true, 'Length limited String type')
+		
+		valid = await ko.String[4].check('12345')
+		t.equal(valid, false, 'Length limited String type returns false when too long')
+
+		valid = await ko.String.minlength(2).check('123')
+		t.equal(valid, true, 'minlength accepts passing value')
+
+		valid = await ko.String.minlength(2).check('1')
+		t.equal(valid, false, 'minlength rejects non passing value')
+
+		valid = await ko.String.range(1, 2).check('12')
+		t.equal(valid, true, 'range accepts passing value')
+
+		valid = await ko.String.range(1, 2).check('123')
+		t.equal(valid, false, 'range rejects non passing value')
+
+		valid = await ko.String.match(/fdsa/).check('fdsa')
+		t.equal(valid, true, 'match accepts passing value')
+
+		valid = await ko.String.match(/fdsa/).check('123')
+		t.equal(valid, false, 'range rejects non passing value')
+
+		t.end()
 	})
 
+	test('Number typetypes should validate correctly', async function (t) {
+		let valid = await ko.Number.check(123)
+		t.equal(valid, true, 'Base Number type')
 
-	test('Number typetypes should validate correctly', function (t) {
-		t.plan(5)
-		Typeclass.types.Number.check(123).then(valid => {
-			t.equal(valid, true, 'Base Number type')
-		})
-		Typeclass.types.Number.check('fdsa').then(valid => {
-			t.equal(valid, false, 'Base Number type returns false when not a Number')
-		})
-		Typeclass.types.Number.min(0).check(123).then(valid => {
-			t.equal(valid, true, 'Min value that passes')
-		})
-		Typeclass.types.Number.min(0).check(-123).then(valid => {
-			t.equal(valid, false, 'Min value that does not pass')
-		})
-		Typeclass.types.Number.min(0).max(123).check(123).then(valid => {
-			t.equal(valid, true, 'Min and Max value that passes')
-		})
+		valid = await ko.Number.check('fdsa')
+		t.equal(valid, false, 'Base Number type returns false when not a Number')
+
+		valid = await ko.Number.min(0).check(123)
+		t.equal(valid, true, 'Min value that passes')
+
+		valid = await ko.Number.min(0).check(-123)
+		t.equal(valid, false, 'Min value that does not pass')
+
+		valid = await ko.Number.min(0).max(123).check(123)
+		t.equal(valid, true, 'Min and Max value that passes')
+
+		valid = await ko.Number.range(1, 3).check(2)
+		t.equal(valid, true, 'Range value that passes')
+
+		valid = await ko.Number.range(1, 3).check(4)
+		t.equal(valid, false, 'Range value that does not pass')
+
+		valid = await ko.Number.integer().check(4)
+		t.equal(valid, true, 'Integer value that passes')
+
+		valid = await ko.Number.integer().check(4.5)
+		t.equal(valid, false, 'Integer value that does not pass')
+
+		t.end()
 	})
 
-	test('Array types should validate correctly', function (t) {
-		t.plan(7)
-		const arrayType = Typeclass.types.Array(Typeclass.types.Number)
-		arrayType.check([]).then(valid => {
-			t.equal(valid, true, 'Array type works for empty array')
-		})
-		arrayType.check([0]).then(valid => {
-			t.equal(valid, true, 'Array type works for array of one element')
-		})
-		arrayType.check([1, 2, 3]).then(valid => {
-			t.equal(valid, true, 'Array type works for array of multiple elements')
-		})
-		arrayType.check(['hello']).then(valid => {
-			t.equal(valid, false, 'Array type returns false for non matching value')
-		})
-		arrayType.check([0, 'hello']).then(valid => {
-			t.equal(valid, false, 'Array type returns false for mixed values')
-		})
-		arrayType.notEmpty().check([0]).then(valid => {
-			t.equal(valid, true, 'notEmpty validator passes')
-		})
-		arrayType.notEmpty().check([]).then(valid => {
-			t.equal(valid, false, 'notEmpty validator fails for empty array')
-		})
+	test('Date types should validate correctly', async function (t) {
+		let valid = await ko.Date.check(new Date())
+		t.equal(valid, true, 'Base Date type')
+
+		valid = await ko.Date.check('not a date')
+		t.equal(valid, false, 'Base Date type rejects non passing value')
+
+		valid = await ko.Date.after(new Date('2018-02-25')).check(new Date('2018-02-26'))
+		t.equal(valid, true, 'Date.after accepts passing value')
+
+		valid = await ko.Date.after(new Date('2018-02-25')).check(new Date('2018-02-24'))
+		t.equal(valid, false, 'Date.after rejects non passing value')
+
+		valid = await ko.Date.before(new Date('2018-02-25')).check(new Date('2018-02-24'))
+		t.equal(valid, true, 'Date.before accepts passing value')
+
+		valid = await ko.Date.before(new Date('2018-02-25')).check(new Date('2018-02-26'))
+		t.equal(valid, false, 'Date.before rejects non passing value')
+
+		valid = await ko.Date.past().check(new Date('2018-02-24'))
+		t.equal(valid, true, 'Date.past accepts passing value')
+
+		valid = await ko.Date.past().check(new Date('2045-01-01'))
+		t.equal(valid, false, 'Date.past rejects non passing value')
+
+		valid = await ko.Date.future().check(new Date('2045-01-01'))
+		t.equal(valid, true, 'Date.future accepts passing value')
+
+		valid = await ko.Date.future().check(new Date('2018-01-01'))
+		t.equal(valid, false, 'Date.future rejects non passing value')
+
+		valid = await ko.Date.range(new Date('2018-01-01'), new Date('2045-01-01')).check(new Date())
+		t.equal(valid, true, 'Date.range accepts passing value')
+
+		valid = await ko.Date.range(new Date('2018-01-01'), new Date('2045-01-01')).check(new Date('2017-12-31'))
+		t.equal(valid, false, 'Date.range rejects non passing value')
+
+		t.end()
 	})
 
-	test('Array of options should validate correctly', function (t) {
-		t.plan(5)
-		const arrayType = Typeclass.types.Array(Typeclass.types.Option([
-			Typeclass.types.Number,
-			Typeclass.types.String
+	test('Utility typeclasses should validate correctly', async function (t) {
+		t.equal(await ko.Email.check('peter@nekodb.net'), true, 'Email type accepts matching value')
+		t.equal(await ko.Email.check('garbage'), false, 'Email type rejects non matching value')
+		t.equal(await ko.URL.check('www.nekodb.net'), true, 'URL type accepts matching value')
+		t.equal(await ko.URL.check('garbage'), false, 'URL type rejects non matching value')
+		t.equal(await ko.URL.Relative.check('/test/route'), true, 'URL.Relative type accepts matching value')
+		t.equal(await ko.URL.Relative.check('ga#?@@##rbage'), false, 'URL.Relative type rejects non matching value')
+		t.end()
+	})
+
+	test('Constant typeclasses should validate correctly', async function (t) {
+		const constType = ko.String.constant('fdsa')
+		t.equal(await constType.check('fdsa'), true, 'Constant String which matches')
+		t.equal(await constType.check(undefined), true, 'Constant String passed undefined')
+		t.equal(await constType.check(null), true, 'Constant String passed null')
+		t.equal(await constType.check(null), true, 'Constant String passed null')
+		t.equal(await constType.check('aaaa'), false, 'Constant String which does not match')
+		t.end()
+	})
+
+	test('Optional classes should validate correctly', async function (t) {
+		const optType = ko.String.optional()
+		t.equal(await optType.check('fdsa'), true, 'Optional passed a string')
+		t.equal(await optType.check(null), true, 'Optional passed null')
+		t.equal(await optType.check(123), false, 'Optional passed non matching value')
+		t.end()
+	})
+
+	test('Array types should validate correctly', async function (t) {
+		const arrayType = ko.Array(ko.Number)
+		
+		t.equal(await arrayType.check([]), true, 'Array type works for empty array')
+		t.equal(await arrayType.check([0]), true, 'Array type works for array of one element')
+		t.equal(await arrayType.check([1, 2, 3]), true, 'Array type works for array of multiple elements')
+		t.equal(await arrayType.check(['hello']), false, 'Array type returns false for non matching value')
+		t.equal(await arrayType.check([0, 'hello']), false, 'Array type returns false for mixed values')
+		t.equal(await arrayType.notEmpty().check([0]), true, 'notEmpty validator passes')
+		t.equal(await arrayType.notEmpty().check([]), false, 'notEmpty validator fails for empty array')
+		t.end()
+	})
+
+	test('Array of options should validate correctly', async function (t) {
+		const arrayType = ko.Array(ko.Option([
+			ko.String,
+			ko.Boolean,
 		]))
-		arrayType.check([]).then(valid => {
-			t.equal(valid, true, 'Option-Array type works for empty array')
-		})
-		arrayType.check(['Hello']).then(valid => {
-			t.equal(valid, true, 'Option-Array type works for single matching element')
-		})
-		arrayType.check([0]).then(valid => {
-			t.equal(valid, true, 'Option-Array type works for single matching element')
-		})
-		arrayType.check([0, 'Hello']).then(valid => {
-			t.equal(valid, true, 'Option-Array type works for mixed types')
-		})
-		arrayType.check([0, 'Hello', null]).then(valid => {
-			t.equal(valid, false, 'Option-Array type returns false for nonmatching values')
-		})
+		
+		t.equal(await arrayType.check([]), true, 'Option-Array type works for empty array')
+		t.equal(await arrayType.check(['Hello']), true, 'Option-Array type works for single matching element')
+		t.equal(await arrayType.check([true]), true, 'Option-Array type works for single matching element')
+		t.equal(await arrayType.check([true, 'Hello']), true, 'Option-Array type works for mixed types')
+		t.equal(await arrayType.check([true, 'Hello', null]), false, 'Option-Array type returns false for nonmatching values')
+		t.end()
 	})
 
-	test('Embedded documents should validate correctly', function (t) {
-		t.plan(3)
-		const documentType = Typeclass.types.Document({
-			name: Typeclass.types.String,
-			age: Typeclass.types.Number
+	test('Embedded documents should validate correctly', async function (t) {
+		const documentType = ko.Document({
+			name: ko.String,
+			age: ko.Number
 		})
-		documentType.check({name: 'John', age: 250}).then(valid => {
-			t.equal(valid, true, 'Matching subdocument type')
-		})
-		documentType.check({name: 250, age: 'John'}).then(valid => {
-			t.equal(valid, false, 'Incompatible subdocument types')
-		})
-		documentType.check({foo: 'bar'}).then(valid => {
-			t.equal(valid, false, 'Incompatible subdocument properties')
-		})
+		let valid = await documentType.check({name: 'John', age: 250})
+		t.equal(valid, true, 'Matching subdocument type')
+
+		valid = await documentType.check({name: 250, age: 'John'})
+		t.equal(valid, false, 'Incompatible subdocument types')
+
+		valid = await documentType.check({foo: 'bar'})
+		t.equal(valid, false, 'Incompatible subdocument properties')
+		t.end()
 	})
 
 	test('All done', function (t) {

@@ -16,10 +16,10 @@ ko.connect = function (config) {
 }
 
 ko.close = function () {
+	this.client.close()
 	this.client = null
 	this.models = null
 	this.Model = null
-	return this.client.close()
 }
 
 module.exports = ko
