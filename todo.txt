@@ -1,11 +1,20 @@
+* Support projections: whoops!
+* Constants (not just strings)
+* default typeclass method
+
+
 * rewrite cursor.forEach
+* support the browser
+* More relationships: backreferences etc.
+* Support Option of References (not possible in current implementation)
+* Two way data flow for embedded models
 - More database methods
+  - insertOne
+  - insertMany
   - findOneAndUpdate
   - findOneAndDelete
   - findOneAndReplace
 - use MongoDB's native validation
-- More relationships: backreferences etc.
-- Support Option of References (not possible in current implementation)
 - Disallow mixing References and basic typeclasses
 - Custom error messages
 - namespacing
