@@ -1,7 +1,6 @@
 * Support projections: whoops!
 * Constants (not just strings)
-* default typeclass method
-
+* NeDB autocompaction
 
 * rewrite cursor.forEach
 * support the browser

@@ -136,9 +136,6 @@ function runTests (ko, next) {
 	test('Constant typeclasses should validate correctly', async function (t) {
 		const constType = ko.String.constant('fdsa')
 		t.equal(await constType.check('fdsa'), true, 'Constant String which matches')
-		t.equal(await constType.check(undefined), true, 'Constant String passed undefined')
-		t.equal(await constType.check(null), true, 'Constant String passed null')
-		t.equal(await constType.check(null), true, 'Constant String passed null')
 		t.equal(await constType.check('aaaa'), false, 'Constant String which does not match')
 		t.end()
 	})
