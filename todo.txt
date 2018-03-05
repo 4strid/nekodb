@@ -1,12 +1,16 @@
 * Support projections: whoops!
-* Constants (not just strings)
 * NeDB autocompaction
+* Make sure reference is not null before joining: this might end up
+joining some random model
+* Let hooks return a Promise TEST THIS
 
 * rewrite cursor.forEach
 * support the browser
 * More relationships: backreferences etc.
 * Support Option of References (not possible in current implementation)
 * Two way data flow for embedded models
+* Reference lookup like (BlogPost.find({'author.username': 'neko'}))
+- Custom instance methods
 - More database methods
   - insertOne
   - insertMany
@@ -17,6 +21,7 @@
 - Disallow mixing References and basic typeclasses
 - Custom error messages
 - namespacing
+- Proposal: Change how validation errors are treated: attach them to the model under an $$errors property rather than rejecting the promise
 - Wildcard Typeclass
 - Support model.update (with type checking)
   - could do this without implementing a full update query processor by implementing rollbacks
