@@ -53,16 +53,18 @@ function runTests (ko, next) {
 				_id: '0',
 				field: 'value'
 			}).save().then(ref => {
-				return ko.models.ko_db_test_test3.validate({
-					ref: '0'
+				const model = ko.models.ko_db_test_test3.create({
+					ref: '0',
 				})
+				return ko.models.ko_db_test_test3.validate(model)
 			}).then(() => {
 				// resolving promise means validation succeeded
 				t.pass('Valid reference passes validation')
 			}).then(() => {
-				ko.models.ko_db_test_test3.validate({
-					ref: '1'
-				}).then(() => {
+				const model = ko.models.ko_db_test_test3.create({
+					ref: '1',
+				})
+				ko.models.ko_db_test_test3.validate(model).then(() => {
 					t.fail('Invalid reference passed validation')
 					t.end()
 				}).catch(err => {
@@ -72,7 +74,6 @@ function runTests (ko, next) {
 					t.end()
 				})
 			}).catch(err => {
-				console.error('unexpected error')
 				t.error(err)
 				t.end()
 			})
@@ -91,30 +92,19 @@ function runTests (ko, next) {
 				ref: ko.models.ko_db_test_ref4.embed()
 			}
 		})
-		ko.models.ko_db_test_test4.validate({
-			ref: {
-				field: 'valid!'
-			}
-		}).then(() => {
+		const model = ko.models.ko_db_test_test4.create({
+			ref: { field: 'valid' },
+		})
+		ko.models.ko_db_test_test4.validate(model).then(() => {
 			// resolved promise means validation passed
 			t.pass('Valid embed passed validation')
-			ko.models.ko_db_test_test4.validate({
-				ref: {
-					field: 100
-				}
-			}).then(() => {
-				// resolved promise means validation passed
-				t.fail('Invalid embed passed validation')
-				t.end()
-			}).catch(err => {
-				// rejected promise means validation failed
-				t.equal(typeof err, 'object', 'Invalid embed fails validation')
-				t.equal('ref' in err, true, 'Error contains correct field')
-				t.end()
-			})
+			return ko.models.ko_db_test_test4.create({
+				ref: { field: 100 },
+			}).saveRefs()
 		}).catch(err => {
-			console.error('unexpected error')
-			t.error(err)
+			// rejected promise means validation failed
+			t.equal(typeof err, 'object', 'Invalid embed fails validation')
+			t.equal('ref' in err, true, 'Error contains correct field')
 			t.end()
 		})
 	})

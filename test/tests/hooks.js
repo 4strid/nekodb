@@ -3,8 +3,8 @@ const test = require('tape')
 function runTests (ko, next) {
 	test('Hooks should run', function (t) {
 		// 6 * 2 for running all hooks
-		// 3 for checks
-		t.plan(15)
+		// 2 for checks
+		t.plan(14)
 		const HookModel = ko.Model('Hooks', {
 			name: ko.String,
 			$$hooks: {
@@ -40,7 +40,6 @@ function runTests (ko, next) {
 		HookModel.create({
 			name: 'Old value',
 		}).save().then(instance => {
-			t.equal(instance.name, 'Old value', 'restored old value after saving')
 			t.equal(instance.additionalValue, 'Added', 'Added value in postsave')
 		}).then(() => {
 			return HookModel.count({name: 'New value'})

@@ -213,6 +213,7 @@ function runTests(ko, next) {
 			t.equal(embedded[0].string, 'New value', 'Embedded document was updated')
 			t.end()
 		}).catch(err => {
+			console.log(err.stack)
 			t.error(err, 'Failed to save the document')
 			t.end()
 		})
@@ -249,6 +250,54 @@ function runTests(ko, next) {
 			t.end()
 		}).catch(err => {
 			t.error(err, 'Failed to save the document')
+			t.end()
+		})
+	})
+
+	test('Saving a model with an invalid embedded reference', function (t) {
+		const EmbeddedModel = ko.Model('ko_db_test_save_embedded_only', {
+			string: ko.String,
+		})
+
+		const EmbedModel = ko.Model('ko_db_test_save_embed_only', {
+			ref: EmbeddedModel,
+		})
+		EmbedModel.create({
+			_id: 0,
+			ref: {
+				string: 1234,
+			},
+		}).saveAll().then(() => {
+			t.fail('Saved an invalid embedded reference')
+			t.end()
+		}).catch(err => {
+			t.deepEqual(err, {
+				ref: { string: 1234 },
+			}, 'Returned a correct errors object')
+			t.end()
+		})
+	})
+
+	test('Saving a model with an invalid embed only reference', function (t) {
+		const EmbeddedModel = ko.Model('ko_db_test_save_embedded_only', {
+			string: ko.String,
+		})
+
+		const EmbedModel = ko.Model('ko_db_test_save_embed_only', {
+			ref: EmbeddedModel.embedOnly(),
+		})
+		EmbedModel.create({
+			_id: 0,
+			ref: {
+				string: 1234,
+			},
+		}).saveAll().then(() => {
+			t.fail('Saved an invalid embed only reference')
+			t.end()
+		}).catch(err => {
+			t.deepEqual(err, {
+				ref: { string: 1234 },
+			}, 'Returned a correct errors object')
 			t.end()
 		})
 	})

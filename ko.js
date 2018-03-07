@@ -3,9 +3,7 @@ const Models = require('./lib/models')
 const clients = require('./lib/clients')
 const util = require('./lib/util')
 
-let chain = Object.create(Typeclass.types)
-
-const ko = Object.create(chain)
+const ko = Object.create(Typeclass.types)
 
 ko.Typeclass = Typeclass
 ko.Instance = Models.Instance
