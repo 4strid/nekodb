@@ -1,6 +1,7 @@
 const Typeclass = require('./lib/typeclass')
 const Models = require('./lib/models')
 const clients = require('./lib/clients')
+const util = require('./lib/util')
 
 let chain = Object.create(Typeclass.types)
 
@@ -11,6 +12,7 @@ ko.Instance = Models.Instance
 
 ko.connect = function (config) {
 	this.client = new clients[config.client](config)
+	util.registerObjectID(this.client.ObjectID)
 	this.models = Models(this.client)
 	this.Model = this.models.Model
 }

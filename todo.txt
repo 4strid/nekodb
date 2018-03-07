@@ -3,6 +3,7 @@
 * Make sure reference is not null before joining: this might end up
 joining some random model
 * Let hooks return a Promise TEST THIS
+* rewrite saving to support encrypting passwords
 
 * rewrite cursor.forEach
 * support the browser
