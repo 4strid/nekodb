@@ -91,6 +91,106 @@ function runTests(ko, next) {
 		})
 	})
 
+	test('Saving a model with an array field', function (t) {
+		const ArrayModel = ko.Model('ko_db_test_save_array', {
+			array: [ko.Number],
+		})
+
+		ArrayModel.create({
+			_id: '01',
+			array: [1],
+		}).save().then(model => {
+			t.deepEqual(model, {
+				_id: '01',
+				array: [1],
+			}, 'Created and saved the model')
+			model.array.push(2)
+			return model.save()
+		}).then(model => {
+			t.deepEqual(model, {
+				_id: '01',
+				array: [1, 2],
+			}, 'Updated and saved the model')
+			return ArrayModel.findOne({_id: '01'})
+		}).then(model => {
+			t.deepEqual(model, {
+				_id: '01',
+				array: [1, 2],
+			}, 'Changes were saved to the database')
+			model.array.splice(1, 1)
+			return model.save()
+		}).then(model => {
+			t.deepEqual(model, {
+				_id: '01',
+				array: [1],
+			}, 'Spliced the array and saved the model')
+			return ArrayModel.findOne({_id: '01'})
+		}).then(model => {
+			t.deepEqual(model, {
+				_id: '01',
+				array: [1],
+			}, 'Changes were saved to the database')
+			t.end()
+		}).catch(err => {
+			t.error(err)
+			t.end()
+		})
+	})
+
+	test('Saving a model with an embedded document field', function (t) {
+		const DocumentModel = ko.Model('ko_db_test_save_document', {
+			document: {
+				field: ko.String,
+			},
+		})
+
+		DocumentModel.create({
+			_id: '00',
+			document: {
+				field: 'hello',
+			},
+		}).save().then(model => {
+			t.deepEqual(model, {
+				_id: '00',
+				document: {
+					field: 'hello',
+				},
+			}, 'Created and saved the model')
+			model.document.field = 'goodbye'
+			return model.save()
+		}).then(model => {
+			t.deepEqual(model, {
+				_id: '00',
+				document: {
+					field: 'goodbye',
+				},
+			}, 'Updated and saved the model')
+			return DocumentModel.findOne({_id: '00'})
+		}).then(model => {
+			t.deepEqual(model, {
+				_id: '00',
+				document: {
+					field: 'goodbye',
+				},
+			}, 'Changes were saved to the database')
+			model.document.field = 'good night'
+			return model.save()
+		}).then(() => {
+			return DocumentModel.findOne({_id: '00'})
+		}).then(model => {
+			t.deepEqual(model, {
+				_id: '00',
+				document: {
+					field: 'good night',
+				},
+			}, 'Changes were saved to the database')
+			t.end()
+		}).catch(err => {
+			t.error(err)
+			t.end()
+		})
+	})
+
 	test('Saving a model with a reference', function (t) {
 		const ReferencedModel = ko.Model('ko_db_test_save_referenced', {
 			string: ko.String,
@@ -213,7 +313,6 @@ function runTests(ko, next) {
 			t.equal(embedded[0].string, 'New value', 'Embedded document was updated')
 			t.end()
 		}).catch(err => {
-			console.log(err.stack)
 			t.error(err, 'Failed to save the document')
 			t.end()
 		})
