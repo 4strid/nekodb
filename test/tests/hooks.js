@@ -2,14 +2,15 @@ const test = require('tape')
 
 function runTests (ko, next) {
 	test('Hooks should run', function (t) {
-		// 6 * 2 for running all hooks
+		// 7 * 2 for running all hooks
 		// 2 for checks
-		t.plan(14)
+		t.plan(16)
 		const HookModel = ko.Model('Hooks', {
 			name: ko.String,
 			$$hooks: {
 				oncreate: function (instance, next) {
 					t.pass('Ran oncreate hook')
+					next()
 				},
 				prevalidate: function (instance, next) {
 					t.pass('Ran prevalidate hook')
@@ -64,7 +65,46 @@ function runTests (ko, next) {
 	})
 
 	test('Named hooks should only run at the appropriate time', function (t) {
-		t.end()
+		const NamedHookModel = ko.Model('NamedHooks', {
+			field1: ko.String.match(/^[a-z]*$/),
+			field2: ko.String.match(/^[a-z]*$/),
+		})
+		NamedHookModel.presave = {
+			field1: (instance, next) => {
+				instance.field1 = '__' + instance.field1
+				next()
+			},
+			field2: (instance, next) => {
+				instance.field2 = '__' + instance.field2
+				next()
+			},
+		}
+
+		NamedHookModel.create({
+			_id: '0',
+			field1: 'abc',
+			field2: 'def',
+		}).save().then(model => {
+			t.deepEqual(model, {
+				_id: '0',
+				field1: '__abc',
+				field2: '__def',
+			}, 'Presave hooks were run when model was created')
+			model.field1 = 'ghi'
+			return model.save()
+		}).then(model => {
+			t.equal(model.field1, '__ghi', 'Updated field ran presave hook')
+			t.equal(model.field2, '__def', 'Not updated field did not run presave hook')
+			return model.save()
+		}).then(model => {
+			t.equal(model.field1, '__ghi', 'When no updates occurred, hooks did not run')
+			t.equal(model.field2, '__def', 'When no updates occurred, hooks did not run')
+			t.end()
+		}).catch(err => {
+			console.log(err)
+			t.error(err)
+			t.end()
+		})
 	})
 
 	test('All done', function (t) {
