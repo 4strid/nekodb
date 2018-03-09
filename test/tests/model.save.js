@@ -1,8 +1,6 @@
 const test = require('tape')
 
-function runTests(ko, next) {
-	const Instance = ko.Instance
-
+function runTests (ko, next) {
 	test('Saving a new simple model successfully', function (t) {
 		const SimpleModel = ko.Model('ko_db_test_save_simple', {
 			string: ko.String,
@@ -40,7 +38,7 @@ function runTests(ko, next) {
 			number: ko.Number,
 		})
 
-		SimpleModelFail.create({}).save().then(simple => {
+		SimpleModelFail.create({}).save().then(() => {
 			t.fail('Model creation succeeded where it should have failed')
 			return SimpleModelFail.count({})
 		}).catch(fields => {
@@ -52,11 +50,12 @@ function runTests(ko, next) {
 			//t.end()
 			return SimpleModelFail.count({})
 		}).then(count => {
+			t.equal(count, 0, 'No new models added to database')
 			return SimpleModelFail.create({
 				string: 'too long string',
 				number: 0,
 			}).save()
-		}).then(simple => {
+		}).then(() => {
 			t.fail('Model creation succeeded where it should have failed')
 			return SimpleModelFail.count({})
 		}).catch(fields => {
@@ -79,7 +78,7 @@ function runTests(ko, next) {
 				string: 'ok',
 				number: 123,
 			}).save()
-		}).then(model => {
+		}).then(() => {
 			t.fail('Model creation succeeded where it should have failed')
 			return SimpleModelFail.count({})
 		}).catch(err => {
@@ -231,7 +230,7 @@ function runTests(ko, next) {
 		}).then(model => {
 			model.field = 'xxx'
 			return model.save()
-		}).then(model => {
+		}).then(() => {
 			return ModelWithRef.findOne({_id: '0'})
 		}).then(model => {
 			t.equal(model.field, 'xxx', 'Document was saved after a join')
@@ -244,7 +243,11 @@ function runTests(ko, next) {
 				},
 			}).saveAll()
 		}).then(model => {
-			t.pass('Created reference and document together')
+			t.deepEqual(model, {
+				_id: '1',
+				field: 'aaa',
+				ref: '1',
+			}, 'Created reference and document together')
 			return ReferencedModel.count({})
 		}).then(count => {
 			t.equal(count, 2, 'Saved reference to the database')
@@ -354,11 +357,11 @@ function runTests(ko, next) {
 	})
 
 	test('Saving a model with an invalid embedded reference', function (t) {
-		const EmbeddedModel = ko.Model('ko_db_test_save_embedded_only', {
+		const EmbeddedModel = ko.Model('ko_db_test_save_invalid_embedded_only', {
 			string: ko.String,
 		})
 
-		const EmbedModel = ko.Model('ko_db_test_save_embed_only', {
+		const EmbedModel = ko.Model('ko_db_test_save_invalid_embed_only', {
 			ref: EmbeddedModel,
 		})
 		EmbedModel.create({
