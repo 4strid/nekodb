@@ -8,6 +8,9 @@ function runTests (ko, next) {
 		const HookModel = ko.Model('Hooks', {
 			name: ko.String,
 			$$hooks: {
+				oncreate: function (instance, next) {
+					t.pass('Ran oncreate hook')
+				},
 				prevalidate: function (instance, next) {
 					t.pass('Ran prevalidate hook')
 					next()
@@ -21,10 +24,11 @@ function runTests (ko, next) {
 					instance.name = 'New value'
 					next()
 				},
-				postsave: function (instance, next) {
+				postsave: function (instance) {
 					t.pass('Ran postsave hook')
 					instance.additionalValue = 'Added'
-					next()
+					// should be able to return a Promise rather than call next
+					return Promise.resolve()
 				},
 				predelete: function (instance, next) {
 					t.pass('Ran predelete hook')
@@ -57,6 +61,10 @@ function runTests (ko, next) {
 		}).catch(err => {
 			t.error(err)
 		})
+	})
+
+	test('Named hooks should only run at the appropriate time', function (t) {
+		t.end()
 	})
 
 	test('All done', function (t) {

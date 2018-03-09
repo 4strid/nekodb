@@ -102,6 +102,34 @@ function runTests (ko, next) {
 		})
 	})
 
+	test('Projections', function (t) {
+		const ProjectionModel = ko.Model('ko_db_test_methods_projections', {
+			number: ko.Number,
+			string: ko.String,
+			bool: ko.Boolean,
+		})
+
+		ProjectionModel.create({
+			number: 1,
+			string: '1',
+			bool: true,
+		}).save().then(() => {
+			return ProjectionModel.findOne({}, {_id: 0, number: 1})
+		}).then(projected => {
+			t.deepEqual(projected, {
+				number: 1,
+			}, 'findOne returned a projection containing the correct fields')
+			return ProjectionModel.find({}, {_id: 0, bool: 0})
+		}).then(projected => {
+			t.deepEqual(projected, [{
+				number: 1,
+				string: '1',
+			}], 'find returned a projection containing the correct fields')
+			t.end()
+		})
+	})
+
+
 	test('Deleting Models', function (t) {
 		const DeleteModel = ko.Model('ko_db_test_methods_deletes', {
 			name: ko.String,

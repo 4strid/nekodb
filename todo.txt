@@ -1,9 +1,6 @@
-* Support projections: whoops!
+* Support projections: whoops! TEST THESE
 * NeDB autocompaction
-* Make sure reference is not null before joining: this might end up
-joining some random model
 * Let hooks return a Promise TEST THIS
-* rewrite saving to support encrypting passwords
 
 * rewrite cursor.forEach
 * support the browser
@@ -22,7 +19,6 @@ joining some random model
 - Disallow mixing References and basic typeclasses
 - Custom error messages
 - namespacing
-- Proposal: Change how validation errors are treated: attach them to the model under an $$errors property rather than rejecting the promise
 - Wildcard Typeclass
 - Support model.update (with type checking)
   - could do this without implementing a full update query processor by implementing rollbacks
