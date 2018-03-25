@@ -12,27 +12,30 @@ const cursorTests = require('./tests/cursor')
 const hooksTests = require('./tests/hooks')
 const indexTests = require('./tests/index')
 const bufferTests = require('./tests/mongodb.buffer')
+const arrayOpsTests = require('./tests/model.arrayops')
 
 const config = require('./config')
 
 function runTests (next) {
-	typeclassTests(ko, () => {
-		methodsTests(ko, () => {
-			saveTests(ko, () => {
-				referenceTests(ko, () => {
-					joinTests(ko, () => {
-						cursorTests(ko, () => {
-							hooksTests(ko, () => {
-								indexTests(ko, () => {
-									next()
-								})
-							})
-						})
-					})
-				})
-			})
-		})
-	})
+	//typeclassTests(ko, () => {
+		//methodsTests(ko, () => {
+			//saveTests(ko, () => {
+				//referenceTests(ko, () => {
+					//joinTests(ko, () => {
+						//cursorTests(ko, () => {
+							//hooksTests(ko, () => {
+								//indexTests(ko, () => {
+									arrayOpsTests(ko, () => {
+										next()
+									})
+								//})
+							//})
+						//})
+					//})
+				//})
+			//})
+		//})
+	//})
 }
 
 ko.connect({
