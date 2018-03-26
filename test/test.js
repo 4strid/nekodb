@@ -58,6 +58,11 @@ runTests(() => {
 		rmrf(path.join(__dirname, 'db'), () => {})
 		ko.close()
 		if (config.testMongo) {
+			ko.connect({
+				client: 'mongodb',
+				url: 'mongodb://' + config.address + '/connection_test',
+			})
+			ko.close()
 			ko.connect(config)
 			bufferTests(ko, () => {
 				// mongodb client
