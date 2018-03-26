@@ -36,8 +36,11 @@
     "tape": "^4.8.0"
   },
   "dependencies": {
+    "deep-equal": "^1.0.1",
     "isemail": "^3.1.1",
+    "merge": "^1.2.0",
     "nedb": "^1.8.0",
+    "traverse": "^0.6.6",
     "url-regex": "^4.1.1"
   },
   "optionalDependencies": {

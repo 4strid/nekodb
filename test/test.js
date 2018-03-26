@@ -12,6 +12,8 @@ const cursorTests = require('./tests/cursor')
 const hooksTests = require('./tests/hooks')
 const indexTests = require('./tests/index')
 const bufferTests = require('./tests/mongodb.buffer')
+const arrayOpsTests = require('./tests/proxy.arrayops')
+const proxySetTests = require('./tests/proxy.set')
 
 const config = require('./config')
 
@@ -24,7 +26,11 @@ function runTests (next) {
 						cursorTests(ko, () => {
 							hooksTests(ko, () => {
 								indexTests(ko, () => {
-									next()
+									arrayOpsTests(ko, () => {
+										proxySetTests(ko, () => {
+											next()
+										})
+									})
 								})
 							})
 						})

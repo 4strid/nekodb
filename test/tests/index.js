@@ -17,8 +17,7 @@ function runTests (ko, next) {
 			return IndexModel.create({
 				name: 'Not unique',
 			}).save()
-		}).then(result => {
-			console.log(result)
+		}).then(() => {
 			t.fail('Model creation succeeded where it should have failed')
 			return IndexModel.count({})
 		}).catch(() => {

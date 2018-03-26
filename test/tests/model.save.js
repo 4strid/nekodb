@@ -504,6 +504,7 @@ function runTests (ko, next) {
 			t.equal(count, 5, 'Saved new reference to the database')
 			t.end()
 		}).catch(err => {
+			console.log(err)
 			t.error(err)
 			t.end()
 		})
