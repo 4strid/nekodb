@@ -130,6 +130,10 @@ function runTests (ko, next) {
 				},
 				ref2: 0,
 			}, 'Only specified references were joined and have correct values')
+		}).then(() => {
+			return JoinModel.findOne({_id: 100}).join(['ref'])
+		}).then(instance => {
+			t.equal(instance, null, 'findOne and join returns null when findOne returns null')
 			t.end()
 		}).catch(err => {
 			t.error(err)
