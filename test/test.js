@@ -18,27 +18,27 @@ const proxySetTests = require('./tests/proxy.set')
 const config = require('./config')
 
 function runTests (next) {
-	//typeclassTests(ko, () => {
-		//methodsTests(ko, () => {
-			//saveTests(ko, () => {
-				//referenceTests(ko, () => {
-					//joinTests(ko, () => {
-						//cursorTests(ko, () => {
-							//hooksTests(ko, () => {
-								//indexTests(ko, () => {
-									//arrayOpsTests(ko, () => {
+	typeclassTests(ko, () => {
+		methodsTests(ko, () => {
+			saveTests(ko, () => {
+				referenceTests(ko, () => {
+					joinTests(ko, () => {
+						cursorTests(ko, () => {
+							hooksTests(ko, () => {
+								indexTests(ko, () => {
+									arrayOpsTests(ko, () => {
 										proxySetTests(ko, () => {
 											next()
 										})
-									//})
-								//})
-							//})
-						//})
-					//})
-				//})
-			//})
-		//})
-	//})
+									})
+								})
+							})
+						})
+					})
+				})
+			})
+		})
+	})
 }
 
 ko.connect({

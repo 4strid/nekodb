@@ -17,11 +17,14 @@ function runTests (ko, next) {
 
 			model.array[1] = 'good night'
 			await model.save()
+			t.deepEqual(model.array._updates, {}, '_updates were reset after saving')
 			let found = await ArrayModel.findOne(model.get_id())
 			t.deepEqual(found.array, ['hello', 'good night'], 'Updated the value in the database')
 
 			model.array[2] = 'howdy'
 			await model.save()
+			t.deepEqual(model.arraysArray._updates, {}, '_updates were reset after saving')
+			t.deepEqual(model.arraysArray[0]._updates, {}, '_updates were reset after saving')
 			found = await ArrayModel.findOne(model.get_id())
 			t.deepEqual(found.array, ['hello', 'good night', 'howdy'], 'Added an element to the end of the array')
 
@@ -54,23 +57,25 @@ function runTests (ko, next) {
 		})
 
 		const model = DocModel.create({
-			subfield: 'hello',
-			subarray: ['good night'],
+			document: {
+				subfield: 'hello',
+				subarray: ['good night'],
+			},
 		})
 
 		try {
 			await model.save()
 
 			model.document.subfield = 'bonjour'
+			model.document.subarray[0] = 'bon nuit'
 			await model.save()
+			t.deepEqual(model.document._updates, {}, '_updates were reset after saving')
+			t.deepEqual(model.document.subarray._updates, {}, '_updates were reset after saving')
 			let found = await DocModel.findOne(model.get_id())
-			t.equal(found.subfield, 'bonjour', 'Saved newly set value to database')
-
-			model.subarray[0] = 'bon nuit'
-			await model.save()
-			found = await DocModel.findOne(model.get_id())
-			t.deepEqual(found.subarray, ['bon nuit'], 'Saved newly set value in subarray')
+			t.equal(found.document.subfield, 'bonjour', 'Saved newly set value to database')
+			t.deepEqual(found.document.subarray, ['bon nuit'], 'Saved newly set value in subarray')
 		} catch (err) {
+			console.log(err)
 			t.error(err)
 		}
 

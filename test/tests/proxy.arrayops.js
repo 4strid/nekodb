@@ -15,7 +15,7 @@ function runTests (ko, next) {
 			t.equal(model.array._replace, true, 'Setting to new array causes array replacement')
 
 			await model.save()
-			t.equal(model.array._replace, undefined, 'Saving resets _replaceArray')
+			t.equal(model.array._replace, undefined, 'Saving resets _replace')
 
 			let found = await ArrayMod.findOne(model.get_id())
 			t.deepEqual(found.array, ['hello'], 'Model updated successfully')
