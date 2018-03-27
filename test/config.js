@@ -1,5 +1,5 @@
 module.exports = {
-	testMongo: true,
+	testMongo: false,
 	client: 'mongodb',
 	username: '',
 	password: '',
