@@ -13,6 +13,11 @@ function runTests (ko, next) {
 			name: ko.String,
 			ref: Ref,
 			refs: [Ref],
+			$$indexes: {
+				name: {
+					unique: true,
+				},
+			},
 		})
 
 		Ref.create({string: 'deleteOne'}).save().then(() => {
