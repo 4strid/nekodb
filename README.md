@@ -168,9 +168,20 @@ ko.connect({
     username: 'root',
     password: 'mongopassword',
     address: 'localhost:27017',
-    database: 'nekodb',
+    database: 'nekodb'
 })
 ```
+
+or
+
+```javascript
+ko.connect({
+    client: 'mongodb',
+	url: 'mongodb://username:password@localhost:27017/nekodb'
+})
+```
+
+You don't need to supply a username or password if they are not required to connect.
 
 Note that you don't have to wait for a callback after connecting. You can just start issuing
 commands, which will be queued up and executed once the database connection has been established.
@@ -647,6 +658,76 @@ Player.find({}).then(allPlayers => {
 })
 ```
 
+### Array operator methods
+Using Array prototype methods (like `.push`, `.splice`, etc.) causes the whole array to be replaced
+when saving to the database. Same goes for setting the field to a new array. To work more
+efficiently with arrays, you can use MongoDB's array manipulation update operators `$push`,
+`$pop`, `$addToSet`, and `$pull`, which are exposed as special methods on any array field.
+
+#### $push
+Adds element(s) to the array. You can pass in either a single element or an array of elements
+as the first argument to `$push`.
+
+You can use the modifiers `$slice` and `$position` to affect the outcome of the push. They are
+supplied as properties on an object as the second argument to `$push`.
+
+- `$slice` limits the length of the array to a certain number, cutting off the end of the array
+if its length exceeds the amount in `$slice`
+- `$position` specifies the position at which to insert the elements. 0 inserts at the beginning
+of the array.
+
+#### $pop
+Removes the first or last element of an array. The argument passed is `1` or `-1` which removes
+the last or first element respectively.
+
+#### $addToSet
+Adds element(s) to the array, but does not add duplicate values. You can pass in either a single
+element or an array of elements. For objects, performs a deep-equal comparison when considering
+whether an element is a duplicate.
+
+#### $pull
+Pulls value(s) from the array. You can pass in either a value to pull or an array of values to pull.
+
+MongoDB (and NeDB) allow you to pass a query to `$pull` rather than a value. While this will
+also work here, NekoDB does not yet contain a full-blown query processor, and as such your
+instance will go out of sync, with those values apparently not pulled from the array, though
+they will be when the instance is saved. If you specified that the array should not be empty,
+using a query may result in the array being empty after all but validation will not catch it.
+It's also not tested. Be careful when passing a query to `$pull`, and avoid it if possible.
+
+```javascript
+const Student = ko.Model('Person', {
+	name: ko.String,
+	classes: [ko.String]
+})
+
+Student.create({
+	name: 'Joanne',
+	classes: ['Calculus', 'Poetry', 'Databases']
+}).save().then(student => {
+	student.classes.$push('Biology')
+	return student.save()
+}).then(student => {
+	student.classes.$push(['Greek Drama', 'Greek Comedy'], {
+		$position: 0,
+		$slice: 4,
+	})
+	// classes will now contain ['Greek Drama', 'Greek Comedy', 'Calculus', 'Poetry']
+	return student.save()
+}).then(student => {
+	// 'Poetry' will not be added to the array as it already exists
+	student.classes.$addToSet(['Poetry', 'Nuclear Physics'])
+	return student.save()
+}).then(student => {
+	// removes the last element of the array. $pop(-1) removes the first.
+	student.classes.$pop(1)
+	return student.save()
+}).then(student => {
+	student.classes.$pull('Calculus')
+	student.save()
+})
+```
+
 ### Saving joined models
 
 If you perform a join on a model, you may note that the model should no longer pass validation:
@@ -1001,10 +1082,14 @@ The MongoClient config looks like
     client: 'mongodb',
     [username: 'username'],
     [password: 'password'],
-    address: 'localhost:27017',
-    database: 'the_db'
+    [address: 'localhost:27017'],
+    [database: 'the_db]',
+	[url: 'mongodb://localhost:27017/the_db']
 }
 ```
+You can supply either the pieces of the connection string as properties (username, password, address, and database)
+or a connection string (url)
+
 - `close()` Closes the connection to the MongoDB server.
 - `createIndex(String collection, String fieldName, Object options)` Creates an index on the
 supplied collection and fieldName. Typically called implicitly by `Model.createIndex()`
