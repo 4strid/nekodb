@@ -3,8 +3,8 @@ const test = require('tape')
 function runTests (ko, next) {
 	test('Set values in an array field', async t => {
 		const ArrayModel = ko.Model('ko_db_test_proxyset_arr', {
-			array: [ko.String],
-			arraysArray: [[ko.Number]],
+			array: [ko.String[10]],
+			arraysArray: [[ko.Number.max(100)]],
 		})
 
 		const model = ArrayModel.create({
@@ -37,11 +37,20 @@ function runTests (ko, next) {
 		}
 
 		try {
-			model.array[0] = 123
+			model.array[0] = 'way too long of a string'
 			await model.save()
 			t.fail('Model saved where it should have failed')
 		} catch (err) {
-			console.log(err)
+			//console.log(err)
+			t.pass('Did not save an invalid field')
+		}
+
+		try {
+			model.arraysArray[0][0] = 100000
+			await model.save()
+			t.fail('Model saved where it should have failed')
+		} catch (err) {
+			//console.log(err)
 			t.pass('Did not save an invalid field')
 		}
 

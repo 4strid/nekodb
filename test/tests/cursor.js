@@ -6,7 +6,9 @@ function runTests (ko, next) {
 
 	test('Setting up', function (t) {
 		ko.models({
-			ko_db_test_cursor: {},
+			ko_db_test_cursor: {
+				_id: ko.Number,
+			},
 		})
 
 		Promise.all([

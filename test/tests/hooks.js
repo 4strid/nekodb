@@ -66,6 +66,7 @@ function runTests (ko, next) {
 
 	test('Named hooks should only run at the appropriate time', function (t) {
 		const NamedHookModel = ko.Model('NamedHooks', {
+			_id: ko.String,
 			field1: ko.String.match(/^[a-z]*$/),
 			field2: ko.String.match(/^[a-z]*$/),
 		})

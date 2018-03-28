@@ -8,6 +8,7 @@ const methodsTests = require('./tests/model.methods')
 const saveTests = require('./tests/model.save')
 const referenceTests = require('./tests/model.reference')
 const joinTests = require('./tests/model.join')
+const coerceTests = require('./tests/model.coerce')
 const cursorTests = require('./tests/cursor')
 const hooksTests = require('./tests/hooks')
 const indexTests = require('./tests/index')
@@ -23,12 +24,14 @@ function runTests (next) {
 			saveTests(ko, () => {
 				referenceTests(ko, () => {
 					joinTests(ko, () => {
-						cursorTests(ko, () => {
-							hooksTests(ko, () => {
-								indexTests(ko, () => {
-									arrayOpsTests(ko, () => {
-										proxySetTests(ko, () => {
-											next()
+						coerceTests(ko, () => {
+							cursorTests(ko, () => {
+								hooksTests(ko, () => {
+									indexTests(ko, () => {
+										arrayOpsTests(ko, () => {
+											proxySetTests(ko, () => {
+												next()
+											})
 										})
 									})
 								})

@@ -14,17 +14,27 @@ function runTests (ko, next) {
 			return SimpleModel.count({})
 		}).then(count => {
 			t.equal(count, 1, 'Count incremented after creation')
-			return SimpleModel.create({_id: 1, string: 'nice'}).save().then(saved => {
-				return saved
-			})
-		}).then(simple => {
+			t.end()
+		}).catch(err => {
+			t.error(err)
+			t.end()
+		})
+	})
+
+	test('Saving a new simple model with specified _id type', function (t) {
+		const SimpleModelNumID = ko.Model('ko_db_test_save_simple_numid', {
+			_id: ko.Number,
+			string: ko.String,
+		})
+
+		SimpleModelNumID.create({_id: 1, string: 'nice'}).save().then(simple => {
 			t.deepEqual(simple, {
 				_id: 1,
 				string: 'nice',
 			}, 'Instance uses assigned _id when specified and contains data')
-			return SimpleModel.count({})
+			return SimpleModelNumID.count({})
 		}).then(count => {
-			t.equal(count, 2, 'Count incremented after creation')
+			t.equal(count, 1, 'Count incremented after creation')
 			t.end()
 		}).catch(err => {
 			t.error(err)
@@ -34,6 +44,7 @@ function runTests (ko, next) {
 
 	test('Saving a simple model unsuccessfully', function (t) {
 		const SimpleModelFail = ko.Model('ko_db_test_save_simple_fail', {
+			_id: ko.String,
 			string: ko.String[5],
 			number: ko.Number,
 		})
@@ -44,6 +55,7 @@ function runTests (ko, next) {
 		}).catch(fields => {
 			t.pass('Failed to save when fields were missing')
 			t.deepEqual(fields, {
+				_id: undefined,
 				string: undefined,
 				number: undefined,
 			}, 'Got back an error object that contained the invalid fields')
@@ -52,6 +64,7 @@ function runTests (ko, next) {
 		}).then(count => {
 			t.equal(count, 0, 'No new models added to database')
 			return SimpleModelFail.create({
+				_id: '101',
 				string: 'too long string',
 				number: 0,
 			}).save()
@@ -92,6 +105,7 @@ function runTests (ko, next) {
 
 	test('Saving a model with an array field', function (t) {
 		const ArrayModel = ko.Model('ko_db_test_save_array', {
+			_id: ko.String,
 			array: [ko.Number],
 		})
 
@@ -138,6 +152,7 @@ function runTests (ko, next) {
 
 	test('Saving a model with an embedded document field', function (t) {
 		const DocumentModel = ko.Model('ko_db_test_save_document', {
+			_id: ko.String,
 			document: {
 				field: ko.String,
 			},
@@ -192,10 +207,12 @@ function runTests (ko, next) {
 
 	test('Saving a model with a reference', function (t) {
 		const ReferencedModel = ko.Model('ko_db_test_save_referenced', {
+			_id: ko.String,
 			string: ko.String,
 		})
 
 		const ModelWithRef = ko.Model('ko_db_test_save_with_ref', {
+			_id: ko.String,
 			field: ko.String,
 			ref: ReferencedModel,
 		})
@@ -271,6 +288,7 @@ function runTests (ko, next) {
 			}, 'Updated reference')
 			t.end()
 		}).catch(err => {
+			console.error(err)
 			t.error(err)
 			t.end()
 		})
@@ -327,6 +345,7 @@ function runTests (ko, next) {
 		})
 
 		const EmbedModel = ko.Model('ko_db_test_save_embed_only', {
+			_id: ko.Number,
 			ref: EmbeddedModel.embedOnly(),
 		})
 		EmbedModel.create({
@@ -358,23 +377,24 @@ function runTests (ko, next) {
 
 	test('Saving a model with an invalid embedded reference', function (t) {
 		const EmbeddedModel = ko.Model('ko_db_test_save_invalid_embedded_only', {
-			string: ko.String,
+			string: ko.String[5],
 		})
 
 		const EmbedModel = ko.Model('ko_db_test_save_invalid_embed_only', {
+			_id: ko.Number,
 			ref: EmbeddedModel,
 		})
 		EmbedModel.create({
 			_id: 0,
 			ref: {
-				string: 1234,
+				string: '123456',
 			},
 		}).saveAll().then(() => {
 			t.fail('Saved an invalid embedded reference')
 			t.end()
 		}).catch(err => {
 			t.deepEqual(err, {
-				ref: { string: 1234 },
+				ref: { string: '123456' },
 			}, 'Returned a correct errors object')
 			t.end()
 		})
@@ -382,23 +402,24 @@ function runTests (ko, next) {
 
 	test('Saving a model with an invalid embed only reference', function (t) {
 		const EmbeddedModel = ko.Model('ko_db_test_save_embedded_only', {
-			string: ko.String,
+			string: ko.String[5],
 		})
 
 		const EmbedModel = ko.Model('ko_db_test_save_embed_only', {
+			_id: ko.Number,
 			ref: EmbeddedModel.embedOnly(),
 		})
 		EmbedModel.create({
 			_id: 0,
 			ref: {
-				string: 1234,
+				string: '123456',
 			},
 		}).saveAll().then(() => {
 			t.fail('Saved an invalid embed only reference')
 			t.end()
 		}).catch(err => {
 			t.deepEqual(err, {
-				ref: { string: 1234 },
+				ref: { string: '123456' },
 			}, 'Returned a correct errors object')
 			t.end()
 		})
@@ -406,6 +427,7 @@ function runTests (ko, next) {
 
 	test('Saving a model with an array of references', function (t) {
 		const ReferencedModel = ko.Model('ko_db_test_save_arr_referenced', {
+			_id: ko.Number,
 			string: ko.String,
 		})
 
@@ -504,7 +526,7 @@ function runTests (ko, next) {
 			t.equal(count, 5, 'Saved new reference to the database')
 			t.end()
 		}).catch(err => {
-			console.log(err)
+			console.error(err)
 			t.error(err)
 			t.end()
 		})
@@ -512,19 +534,24 @@ function runTests (ko, next) {
 
 	test('Saving a model with an array of embedded references', function (t) {
 		const EmbeddedModel = ko.Model('ko_db_test_save_arr_embedded', {
+			_id: ko.Number,
 			string: ko.String,
 		})
 
 		const EmbedModel = ko.Model('ko_db_test_save_arr_embed', {
+			_id: ko.Number,
 			name: ko.String,
 			refs: [EmbeddedModel.embed()],
 		})
 
 		EmbedModel.create({
+			_id: 12,
 			name: 'xyz',
 			refs: [{
+				_id: 100,
 				string: '1',
 			}, {
+				_id: 101,
 				string: '2',
 			}],
 		}).saveAll().then(saved => {
