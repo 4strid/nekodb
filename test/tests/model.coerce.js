@@ -148,7 +148,7 @@ function runTests (ko, next) {
 			found = await DateModel.findOne({date: {$gt: new Date('1970-01-01')}})
 			t.notEqual(found, null, 'Found the model when searching with a complex query with a date value')
 
-			found = await DateModel.findOne({date: {$gt: '1970-01-01', $lt: Date.now()}})
+			found = await DateModel.findOne({date: {$gt: '1970-01-01', $lte: Date.now()}})
 			t.notEqual(found, null, 'Found the model when searching with a complex query which requires coersion')
 		} catch (err) {
 			t.error(err)
@@ -168,11 +168,11 @@ function runTests (ko, next) {
 			})
 			t.deepEqual(model.arr, [1, 2, 3], 'Values which do not need to be coerced remain ok')
 
-			model.arr = ['1', '2', '3']
-			t.deepEqual(model.arr, [1, 2, 3], 'Values are coerced when the array is set to a new array')
+			model.arr = ['-1', '2', '3']
+			t.deepEqual(model.arr, [-1, 2, 3], 'Values are coerced when the array is set to a new array')
 
 			model.arr[3] = 4
-			t.deepEqual(model.arr, [1, 2, 3, 4], 'Values which do not need to be coerced can be set on the array')
+			t.deepEqual(model.arr, [-1, 2, 3, 4], 'Values which do not need to be coerced can be set on the array')
 
 			model.arr[0] = '5'
 			t.deepEqual(model.arr, [5, 2, 3, 4], 'Setting an array value coerces a string to a number')
@@ -213,6 +213,94 @@ function runTests (ko, next) {
 			found = await ArrayModel.findOne({arr: {$size: '4'}})
 			t.notEqual(found, null, 'Found the model when searching with coerced $size')
 		} catch (err) {
+			t.error(err)
+		}
+
+		t.end()
+	})
+
+	test('Coercing arrays of arrays', async t => {
+		const ArraysModel = ko.Model('ko_db_test_coerce_arrays', {
+			arrays: [[ko.Number]],
+		})
+
+		try {
+			const model = ArraysModel.create({
+				arrays: [[1, 2, 3], [4, 5]],
+			})
+
+			model.arrays[1][1] = '50'
+			t.equal(model.arrays[1][1], 50, 'Coerced value when setting in nested array')
+
+			model.arrays[1] = ['100']
+			t.deepEqual(model.arrays[1], [100], 'Coerced value when setting a nested array to a new array')
+
+			model.arrays = [['4', '5', '6'], ['7', '8']]
+			t.deepEqual(model.arrays, [[4, 5, 6], [7, 8]], 'Coerced value when setting array of arrays to a new array')
+
+			await model.save()
+
+			let found = await ArraysModel.findOne({arrays: [['4', '5', '6'], ['7', '8']]})
+			t.notEqual(found, null, 'Found array when searching by full array value')
+
+			found = await ArraysModel.findOne({'arrays.1.1': '8'})
+			t.notEqual(found, null, 'Found array when searching by nested nested value')
+
+			found = await ArraysModel.findOne({'arrays.0': {$nin: ['100']}})
+			t.notEqual(found, null, 'Found array when searching by nested field with complex query')
+		} catch (err) {
+			console.log(err)
+			t.error(err)
+		}
+
+		t.end()
+	})
+
+	test('Coercing embedded documents', async t => {
+		const DocumentModel = ko.Model('ko_db_test_coerce_document', {
+			document: {
+				number: ko.Number,
+				boolean: ko.Boolean,
+				array: [ko.Number],
+			},
+		})
+
+		try {
+			const model = DocumentModel.create({
+				document: {
+					number: 10,
+					boolean: true,
+					array: [12],
+				},
+			})
+
+			model.document.number = '13'
+			t.equal(model.document.number, 13, 'Embedded document field coerced from string to number')
+			model.document.boolean = 'false'
+			t.equal(model.document.boolean, false, 'Embedded document field coerced from string to boolean')
+			model.document.array[0] = '99'
+			t.equal(model.document.array[0], 99, 'Updating array field in embedded document was coerced')
+			model.document.array = ['1', '2', '3']
+			t.deepEqual(model.document.array, [1, 2, 3], 'Setting array field in embedded document causes coersion')
+
+			await model.save()
+
+			let found = await DocumentModel.findOne({
+				document: {
+					number: '13',
+					boolean: 'false',
+					array: ['1', '2', '3'],
+				},
+			})
+			t.notEqual(found, null, 'Found the model when searching with string values')
+
+			found = await DocumentModel.findOne({
+				'document.number': '13',
+			})
+			t.notEqual(found, null, 'Found the model when querying on an embedded field')
+
+		} catch (err) {
+			console.log(err)
 			t.error(err)
 		}
 
@@ -307,12 +395,12 @@ function runTests (ko, next) {
 		const model1 = ComplexModel.create({
 			string: 'Hello',
 			number: 10,
-			array: [true, true, true]
+			array: [true, true, true],
 		})
 
 		// not enough time passes for ko.Date.now() to return unique values
 		await new Promise((resolve) => {
-			setTimeout(() => resolve(), 1)
+			setTimeout(() => resolve(), 10)
 		})
 
 		const model2 = ComplexModel.create({
@@ -324,7 +412,7 @@ function runTests (ko, next) {
 		const model3 = ComplexModel.create({
 			string: 'Goodbye',
 			number: 12,
-			array: [false, false, false]
+			array: [false, false, false],
 		})
 
 		try {
@@ -358,7 +446,7 @@ function runTests (ko, next) {
 			}).sort({date: 1})
 			t.deepEqual(found, [model1, model2], 'Found all the documents with an and/or query with coerced values')
 		} catch (err) {
-			console.error(err)
+			console.log(err)
 			t.error(err)
 		}
 

@@ -51,31 +51,31 @@ ko.connect({
 
 // nedb in memory client
 runTests(() => {
-	ko.close()
-	ko.connect({
-		client: 'nedb',
-		filepath: path.join(__dirname, 'db'),
-	})
-	// nedb file client
-	runTests(() => {
-		rmrf(path.join(__dirname, 'db'), () => {})
-		ko.close()
-		if (config.testMongo) {
-			ko.connect({
-				client: 'mongodb',
-				url: 'mongodb://' + config.address + '/connection_test',
-			})
-			ko.close()
-			ko.connect(config)
-			bufferTests(ko, () => {
-				// mongodb client
-				runTests(() => {
-					ko.client.client.db(config.database).dropDatabase().then(() => {
-						ko.close()
-					})
-				})
-			})
-		}
-	})
+	//ko.close()
+	//ko.connect({
+		//client: 'nedb',
+		//filepath: path.join(__dirname, 'db'),
+	//})
+	//// nedb file client
+	//runTests(() => {
+		//rmrf(path.join(__dirname, 'db'), () => {})
+		//ko.close()
+		//if (config.testMongo) {
+			//ko.connect({
+				//client: 'mongodb',
+				//url: 'mongodb://' + config.address + '/connection_test',
+			//})
+			//ko.close()
+			//ko.connect(config)
+			//bufferTests(ko, () => {
+				//// mongodb client
+				//runTests(() => {
+					//ko.client.client.db(config.database).dropDatabase().then(() => {
+						//ko.close()
+					//})
+				//})
+			//})
+		//}
+	//})
 })
 
