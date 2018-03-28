@@ -43,15 +43,16 @@ function runTests (ko, next) {
 		try {
 			ko.models({
 				ko_db_test_ref3: {
-					field: ko.String
+					_id: ko.String,
+					field: ko.String,
 				},
 				ko_db_test_test3: {
-					ref: ko.models.ko_db_test_ref3.reference()
+					ref: ko.models.ko_db_test_ref3.reference(),
 				}
 			})
 			ko.models.ko_db_test_ref3.create({
 				_id: '0',
-				field: 'value'
+				field: 'value',
 			}).save().then(ref => {
 				const model = ko.models.ko_db_test_test3.create({
 					ref: '0',
@@ -86,14 +87,14 @@ function runTests (ko, next) {
 	test('Validation works for schemas that contain embedded references', function (t) {
 		ko.models({
 			ko_db_test_ref4: {
-				field: ko.String
+				field: ko.Number.max(99)
 			},
 			ko_db_test_test4: {
 				ref: ko.models.ko_db_test_ref4.embed()
 			}
 		})
 		const model = ko.models.ko_db_test_test4.create({
-			ref: { field: 'valid' },
+			ref: { field: 10 },
 		})
 		ko.models.ko_db_test_test4.validate(model).then(() => {
 			// resolved promise means validation passed
@@ -101,6 +102,9 @@ function runTests (ko, next) {
 			return ko.models.ko_db_test_test4.create({
 				ref: { field: 100 },
 			}).saveRefs()
+		}).then(saved => {
+			t.fail('Model saved where it should have failed')
+			t.end()
 		}).catch(err => {
 			// rejected promise means validation failed
 			t.equal(typeof err, 'object', 'Invalid embed fails validation')

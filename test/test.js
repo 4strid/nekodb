@@ -19,29 +19,29 @@ const proxySetTests = require('./tests/proxy.set')
 const config = require('./config')
 
 function runTests (next) {
-	//typeclassTests(ko, () => {
-		//methodsTests(ko, () => {
-			//saveTests(ko, () => {
-				//referenceTests(ko, () => {
-					//joinTests(ko, () => {
+	typeclassTests(ko, () => {
+		methodsTests(ko, () => {
+			saveTests(ko, () => {
+				referenceTests(ko, () => {
+					joinTests(ko, () => {
 						coerceTests(ko, () => {
-							//cursorTests(ko, () => {
-								//hooksTests(ko, () => {
-									//indexTests(ko, () => {
-										//arrayOpsTests(ko, () => {
-											//proxySetTests(ko, () => {
+							cursorTests(ko, () => {
+								hooksTests(ko, () => {
+									indexTests(ko, () => {
+										arrayOpsTests(ko, () => {
+											proxySetTests(ko, () => {
 												next()
-											//})
-										//})
-									//})
-								//})
-							//})
+											})
+										})
+									})
+								})
+							})
 						})
-					//})
-				//})
-			//})
-		//})
-	//})
+					})
+				})
+			})
+		})
+	})
 }
 
 ko.connect({
@@ -67,14 +67,14 @@ runTests(() => {
 			})
 			ko.close()
 			ko.connect(config)
-			//bufferTests(ko, () => {
+			bufferTests(ko, () => {
 				// mongodb client
 				runTests(() => {
 					ko.client.client.db(config.database).dropDatabase().then(() => {
 						ko.close()
 					})
 				})
-			//})
+			})
 		}
 	})
 })

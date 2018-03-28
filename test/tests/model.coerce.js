@@ -28,9 +28,6 @@ function runTests (ko, next) {
 			model.bool = 0
 			t.equal(typeof model.bool, 'boolean', 'Number value 0 is coerced to a boolean')
 			t.equal(model.bool, false, 'Number value 0 is coerced to false')
-			model.bool = undefined
-			t.equal(typeof model.bool, 'boolean', 'undefined is coerced to a boolean')
-			t.equal(model.bool, false, 'undefined is coerced to false')
 			await model.save()
 
 			const count = await BooleanModel.count({bool: false})
@@ -289,6 +286,75 @@ function runTests (ko, next) {
 			found = await RefModelByNumber.findOne({ref: '0'})
 			t.notEqual(found, null, 'Found the model when searching by a string')
 		} catch (err) {
+			t.error(err)
+		}
+
+		t.end()
+	})
+
+	test('Coerce complex queries', async t => {
+		const ComplexModel = ko.Model('ko_db_test_coerce_queries', {
+			string: ko.String,
+			number: ko.Number,
+			array: [ko.Boolean],
+			date: ko.Date.now(),
+		})
+
+		const model1 = ComplexModel.create({
+			string: 'Hello',
+			number: 10,
+			array: [true, true, true]
+		})
+
+		// not enough time passes for ko.Date.now() to return unique values
+		await new Promise((resolve) => {
+			setTimeout(() => resolve(), 1)
+		})
+
+		const model2 = ComplexModel.create({
+			string: 'Hello',
+			number: 11,
+			array: [true, false, true],
+		})
+
+		const model3 = ComplexModel.create({
+			string: 'Goodbye',
+			number: 12,
+			array: [false, false, false]
+		})
+
+		try {
+			await model1.save()
+			await model2.save()
+			await model3.save()
+
+			let found = await ComplexModel.findOne({
+				$and: [
+					{string: 'Hello'},
+					{number: 10},
+					{array: {$nin: [false]}},
+				],
+			})
+			t.deepEqual(model1._id, found._id, 'Found the correct model where coersion was not necessary')
+
+			found = await ComplexModel.findOne({
+				$and: [
+					{string: 'Hello'},
+					{number: '10'},
+					{array: {$nin: ['false']}},
+				],
+			})
+			t.deepEqual(model1._id, found._id, 'Found the correct model where coersion of query was necessary')
+
+			found = await ComplexModel.find({
+				$and: [
+					{$or: [{string: 'Goodbye'}, {string: 'Hello'}]},
+					{$or: [{number: '11'}, {array: {$nin: ['false']}}]},
+				],
+			}).sort({date: 1})
+			t.deepEqual(found, [model1, model2], 'Found all the documents with an and/or query with coerced values')
+		} catch (err) {
+			console.error(err)
 			t.error(err)
 		}
 
