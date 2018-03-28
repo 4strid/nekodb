@@ -34,7 +34,7 @@ function runTests (ko, next) {
 
 	test('Test array.$push method', async t => {
 		const ArrPush = ko.Model('ko_db_test_arrayop_push', {
-			array: [ko.String],
+			array: [ko.String[10]],
 		})
 
 		const model = await ArrPush.create({
@@ -62,11 +62,11 @@ function runTests (ko, next) {
 		}
 
 		try {
-			model.array.$push(100)
+			model.array.$push('too long of a string')
 			await model.save()
 			t.fail('Model saved where it should have failed')
 		} catch (err) {
-			console.log(err)
+			//console.log(err)
 			t.pass('Threw an error when attempting to $push invalid value')
 		}
 
@@ -107,7 +107,7 @@ function runTests (ko, next) {
 
 	test('Test array.$addToSet method', async t => {
 		const ArrAddToSet = ko.Model('ko_db_test_arrayop_addtoset', {
-			array: [ko.String],
+			array: [ko.String[10]],
 		})
 
 		const model = ArrAddToSet.create({
@@ -141,11 +141,11 @@ function runTests (ko, next) {
 		}
 
 		try {
-			model.array.$addToSet(100)
+			model.array.$addToSet('too long of a string')
 			await model.save()
 			t.fail('Model saved where it should have failed')
 		} catch (err) {
-			console.log(err)
+			//console.log(err)
 			t.pass('Threw an error when attempting to $addToSet invalid value')
 		}
 
@@ -185,7 +185,7 @@ function runTests (ko, next) {
 			await model.save()
 			t.fail('Model saved where it should have failed')
 		} catch (err) {
-			console.log(err)
+			//console.log(err)
 			t.pass('Model would not save an empty array')
 		}
 

@@ -174,20 +174,24 @@ function runTests (ko, next) {
 			model.arr[3] = 4
 			t.deepEqual(model.arr, [1, 2, 3, 4], 'Values which do not need to be coerced can be set on the array')
 
-			// proxy does not perform coersion (yet)
-			// model.arr[0] = '5'
-			//t.deepEqual(model.arr, [5, 2, 3, 4], 'Setting an array value coerces a string to a number')
+			model.arr[0] = '5'
+			t.deepEqual(model.arr, [5, 2, 3, 4], 'Setting an array value coerces a string to a number')
 
-			// using native array methods does not perform coersion (yet)
-			// model.arr.push('6')
-			//t.deepEqual(model.arr, [5, 2, 3, 4, 6], 'Pushing a value performs coersion')
+			model.arr.push('6')
+			t.deepEqual(model.arr, [5, 2, 3, 4, 6], 'Pushing a value performs coersion')
+
+			model.arr.$addToSet(['5', '7'])
+			t.deepEqual(model.arr, [5, 2, 3, 4, 6, 7], 'Array operator method $addToSet performs coersion')
+
+			model.arr.$push('8', {$position: 0, $slice: 4})
+			t.deepEqual(model.arr, [8, 5, 2, 3], 'Array operator method $push performs coersion')
 
 			await model.save()
 
-			const count = await ArrayModel.count({arr: [1, 2, 3, 4]})
+			const count = await ArrayModel.count({arr: [8, 5, 2, 3]})
 			t.equal(count, 1, 'Found the model when searching with an array of uncoerced values')
 
-			let found = await ArrayModel.findOne({arr: ['1', '2', '3', '4']})
+			let found = await ArrayModel.findOne({arr: ['8', '5', '2', '3']})
 			t.notEqual(found, null, 'Found the model when searching with coerced values')
 
 			found = await ArrayModel.findOne({arr: {$elemMatch: {$gt: 0}}})
