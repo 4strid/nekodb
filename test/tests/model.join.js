@@ -7,16 +7,18 @@ function runTests (ko, next) {
 
 	test('Setting up', function (t) {
 		RefModel = ko.Model('ko_db_test_join_ref', {
+			_id: ko.Number,
 			field: ko.String,
 		})
 
-
 		JoinModel = ko.Model('ko_db_test_join', {
+			_id: ko.Number,
 			ref: RefModel,
 			ref2: RefModel,
 		})
 
 		JoinArrModel = ko.Model('ko_db_test_join_multi', {
+			_id: ko.Number,
 			refs: [RefModel],
 		})
 

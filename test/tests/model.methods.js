@@ -84,7 +84,9 @@ function runTests (ko, next) {
 	})
 
 	test('Model#findById', function (t) {
-		const FindByIdModel = ko.Model('ko_db_test_methods_findbyid', {})
+		const FindByIdModel = ko.Model('ko_db_test_methods_findbyid', {
+			_id: ko.String,
+		})
 
 		FindByIdModel.create({
 			_id: '123',
@@ -140,9 +142,9 @@ function runTests (ko, next) {
 			DeleteModel.create({name: 'Berry'}).save(),
 			DeleteModel.create({name: 'Bernie'}).save(),
 			DeleteModel.create({name: 'Barry'}).save(),
-			DeleteModel.create({_id: 'B0R1S', name: 'Boris'}).save(),
-		]).then(() => {
-			return DeleteModel.deleteById('B0R1S')
+			DeleteModel.create({name: 'Boris'}).save(),
+		]).then(models => {
+			return DeleteModel.deleteById(models[4]._id)
 		}).then(() => {
 			return DeleteModel.count({})
 		}).then(count => {
