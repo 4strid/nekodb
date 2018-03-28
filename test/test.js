@@ -8,6 +8,7 @@ const methodsTests = require('./tests/model.methods')
 const saveTests = require('./tests/model.save')
 const referenceTests = require('./tests/model.reference')
 const joinTests = require('./tests/model.join')
+const coerceTests = require('./tests/model.coerce')
 const cursorTests = require('./tests/cursor')
 const hooksTests = require('./tests/hooks')
 const indexTests = require('./tests/index')
@@ -18,27 +19,29 @@ const proxySetTests = require('./tests/proxy.set')
 const config = require('./config')
 
 function runTests (next) {
-	typeclassTests(ko, () => {
-		methodsTests(ko, () => {
-			saveTests(ko, () => {
-				referenceTests(ko, () => {
-					joinTests(ko, () => {
-						cursorTests(ko, () => {
-							hooksTests(ko, () => {
-								indexTests(ko, () => {
-									arrayOpsTests(ko, () => {
-										proxySetTests(ko, () => {
-											next()
-										})
-									})
-								})
-							})
+	//typeclassTests(ko, () => {
+		//methodsTests(ko, () => {
+			//saveTests(ko, () => {
+				//referenceTests(ko, () => {
+					//joinTests(ko, () => {
+						coerceTests(ko, () => {
+							//cursorTests(ko, () => {
+								//hooksTests(ko, () => {
+									//indexTests(ko, () => {
+										//arrayOpsTests(ko, () => {
+											//proxySetTests(ko, () => {
+												next()
+											//})
+										//})
+									//})
+								//})
+							//})
 						})
-					})
-				})
-			})
-		})
-	})
+					//})
+				//})
+			//})
+		//})
+	//})
 }
 
 ko.connect({
@@ -64,14 +67,14 @@ runTests(() => {
 			})
 			ko.close()
 			ko.connect(config)
-			bufferTests(ko, () => {
+			//bufferTests(ko, () => {
 				// mongodb client
 				runTests(() => {
 					ko.client.client.db(config.database).dropDatabase().then(() => {
 						ko.close()
 					})
 				})
-			})
+			//})
 		}
 	})
 })
