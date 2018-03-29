@@ -7,6 +7,7 @@ function runTests (ko, next) {
 		t.plan(16)
 		const HookModel = ko.Model('Hooks', {
 			name: ko.String,
+			update: ko.String,
 			$$hooks: {
 				oncreate: function (instance, next) {
 					t.pass('Ran oncreate hook')
@@ -23,6 +24,10 @@ function runTests (ko, next) {
 				presave: function (instance, next) {
 					t.pass('Ran presave hook')
 					instance.name = 'New value'
+
+					if (instance.isUpdated('update')) {
+						instance.update = 'this field was updated'
+					}
 					next()
 				},
 				postsave: function (instance) {
@@ -44,16 +49,18 @@ function runTests (ko, next) {
 
 		HookModel.create({
 			name: 'Old value',
+			update: 'Old value',
 		}).save().then(instance => {
 			t.equal(instance.additionalValue, 'Added', 'Added value in postsave')
 		}).then(() => {
-			return HookModel.count({name: 'New value'})
+			return HookModel.count({name: 'New value', update: 'this field was updated'})
 		}).then(count => {
 			t.equal(count, 1, 'Saved to database with changed value')
 			return HookModel.deleteOne({name: 'New value'})
 		}).then(() => {
 			return HookModel.create({
 				name: 'Value',
+				update: 'Value',
 			}).save()
 		}).then(() => {
 			return HookModel.deleteMany({})
@@ -61,50 +68,6 @@ function runTests (ko, next) {
 			t.end()
 		}).catch(err => {
 			t.error(err)
-		})
-	})
-
-	test('Named hooks should only run at the appropriate time', function (t) {
-		const NamedHookModel = ko.Model('NamedHooks', {
-			_id: ko.String,
-			field1: ko.String.match(/^[a-z]*$/),
-			field2: ko.String.match(/^[a-z]*$/),
-		})
-		NamedHookModel.presave = {
-			field1: (instance, next) => {
-				instance.field1 = '__' + instance.field1
-				next()
-			},
-			field2: (instance, next) => {
-				instance.field2 = '__' + instance.field2
-				next()
-			},
-		}
-
-		NamedHookModel.create({
-			_id: '0',
-			field1: 'abc',
-			field2: 'def',
-		}).save().then(model => {
-			t.deepEqual(model, {
-				_id: '0',
-				field1: '__abc',
-				field2: '__def',
-			}, 'Presave hooks were run when model was created')
-			model.field1 = 'ghi'
-			return model.save()
-		}).then(model => {
-			t.equal(model.field1, '__ghi', 'Updated field ran presave hook')
-			t.equal(model.field2, '__def', 'Not updated field did not run presave hook')
-			return model.save()
-		}).then(model => {
-			t.equal(model.field1, '__ghi', 'When no updates occurred, hooks did not run')
-			t.equal(model.field2, '__def', 'When no updates occurred, hooks did not run')
-			t.end()
-		}).catch(err => {
-			console.log(err)
-			t.error(err)
-			t.end()
 		})
 	})
 

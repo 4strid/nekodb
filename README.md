@@ -190,6 +190,8 @@ Though they are executed in order, there's no way to guarantee that they finish 
 need the results of one call in a subsequent call you should still use a Promise chain to order
 your calls.
 
+#### You must call ko.connect before creating your models or you will get the error "ko.models is not defined"
+
 ## Creating schemas
 
 To create a schema you can call `ko.models` as in the Quick Intro to create all your schemas at
@@ -822,12 +824,8 @@ define your model, where the keys are the names of the hooks to be added and the
 hooks. Or, you can set a value on the Model object whose property name is one of the names of
 the hooks.
 
-Hooks can be a function, which will run regardless of what fields have been updated, or an object
-whose keys are fields, and whose values are the hooks to run only when the specified field is
-updated. To add a named hook that always runs, use `''` as the field name.
-
-For expensive operations, or operations which should not be repeated, you should use a hook
-object with named hooks to limit when the hooks are run.
+To determine whether a hook should modify a certain field you can use the instance method
+`isUpdated` which takes a field name.
 
 #### oncreate
 Runs immediately after a model is created. Used to asynchronously add default values to a model
@@ -860,17 +858,17 @@ const User = ko.Model('User', {
     username: ko.String.range(2, 30), 
     password: Password,
     $$hooks: {
-        presave: {
-            password: (user, next) => {
-                bcrypt.hash(user.password, saltRounds, function (err, hash) {
-                    if (err) {
-                        return next(err)
-                    }
-                    user.password = hash
-                    next()
-                })
-            }
-        }
+		presave: (user, next) => {
+			if (user.isUpdated('password')) {
+				bcrypt.hash(user.password, saltRounds, function (err, hash) {
+					if (err) {
+						return next(err)
+					}
+					user.password = hash
+					next()
+				})
+			}
+		}
     }
 })
 
@@ -917,6 +915,7 @@ const User = ko.Model('User', {
     }
 })
 ```
+
 Now an error will be thrown if we attempt to create two users with the same username.
 
 API Reference
