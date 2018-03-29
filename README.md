@@ -177,7 +177,7 @@ or
 ```javascript
 ko.connect({
     client: 'mongodb',
-	url: 'mongodb://username:password@localhost:27017/nekodb'
+    url: 'mongodb://username:password@localhost:27017/nekodb'
 })
 ```
 
@@ -207,6 +207,7 @@ const User = ko.Model('User', {
 })
 ```
 
+
 The first argument to `ko.Model` is the name of the model, which is the name of the collection
 and the property name with which it will be attached to `ko.models`.
 
@@ -217,6 +218,11 @@ The second argument is the schema to use, which is supplied as an object. The ob
 the field names, and its values are Ko typeclasses. Typeclasses will check to ensure instance
 values are of the correct type, and can also perform additional validation and set values, as we
 will see shortly.
+
+### \_id field
+The `_id` field is automatically added to every model, expecting a type of ObjectID to be created
+and saved by the database. If you intend to use a different type of \_id that you will supply
+yourself, you must specify so explicitly.
 
 ### Builtin types
 
@@ -497,16 +503,22 @@ Celebrity.find({age: 37}).then(celebs => {
     celebs.forEach(celeb => {
         console.log(celeb)
     })
+}).catch(err => {
+    console.log()
 })
 // returns all celebrity models with age = 37
 
 Celebrity.findOne({name: 'Kanye West'}).then(kanye => {
     console.log(kanye)
+}).catch(err => {
+    console.log()
 })
 // finds one model whose name is 'Kanye West'
 
 Celebrity.findById('ps30L4dHbv9rLTln').then(celeb => {
     console.log(celeb)
+}).catch(err => {
+    console.log()
 })
 // finds the model with the given _id
 ```
@@ -531,19 +543,23 @@ Using `{}` as a query returns all the documents.
 ```javascript
 ko.models.Celebrity.find({age: {$gte: 40}}).then(celebs => {
     celebs.forEach(celeb => console.log(celeb))
+}).catch(err => {
+    console.log()
 })
 // logs all celebrities at least 40 years old
 
 ko.models.BlogPost.find({
     $and: [
         {date: {$gte: '2017-01-01', $lt: '2018-01-01'}},
-		{$or: [
-			{title: {$regex: /JavaScript/i}},
+        {$or: [
+            {title: {$regex: /JavaScript/i}},
             {title: {$regex: /MongoDB/i}}
-		]}
+        ]}
     ]
 }).then(posts => {
     posts.forEach(post => console.log(post))
+}).catch(err => {
+    console.log()
 })
 // we specified two fields in this query: title and postDate
 // logs all blog posts whose titles contain "JavaScript" or "MongoDB" posted in 2017
@@ -574,6 +590,8 @@ a one way trip, and do not return a model instance, rather just returning a plai
 ko.models.BlogPost.find({}, {title: 1, _id: 0}).then(titles => {
     console.log(titles)
     // objects that only contain the title field
+}).catch(err => {
+    console.log()
 })
 ```
 
@@ -627,6 +645,8 @@ Blog.find({}).join().then(blogs => {
     console.log(blogs)
     // every blog in the array contains a full Author model in the owner field,
     // and an array of full BlogPost models in the posts field
+}).catch(err => {
+    console.log()
 })
 ```
 
@@ -705,34 +725,36 @@ It's also not tested. Be careful when passing a query to `$pull`, and avoid it i
 
 ```javascript
 const Student = ko.Model('Person', {
-	name: ko.String,
-	classes: [ko.String]
+    name: ko.String,
+    classes: [ko.String]
 })
 
 Student.create({
-	name: 'Joanne',
-	classes: ['Calculus', 'Poetry', 'Databases']
+    name: 'Joanne',
+    classes: ['Calculus', 'Poetry', 'Databases']
 }).save().then(student => {
-	student.classes.$push('Biology')
-	return student.save()
+    student.classes.$push('Biology')
+    return student.save()
 }).then(student => {
-	student.classes.$push(['Greek Drama', 'Greek Comedy'], {
-		$position: 0,
-		$slice: 4,
-	})
-	// classes will now contain ['Greek Drama', 'Greek Comedy', 'Calculus', 'Poetry']
-	return student.save()
+    student.classes.$push(['Greek Drama', 'Greek Comedy'], {
+        $position: 0,
+        $slice: 4,
+    })
+    // classes will now contain ['Greek Drama', 'Greek Comedy', 'Calculus', 'Poetry']
+    return student.save()
 }).then(student => {
-	// 'Poetry' will not be added to the array as it already exists
-	student.classes.$addToSet(['Poetry', 'Nuclear Physics'])
-	return student.save()
+    // 'Poetry' will not be added to the array as it already exists
+    student.classes.$addToSet(['Poetry', 'Nuclear Physics'])
+    return student.save()
 }).then(student => {
-	// removes the last element of the array. $pop(-1) removes the first.
-	student.classes.$pop(1)
-	return student.save()
+    // removes the last element of the array. $pop(-1) removes the first.
+    student.classes.$pop(1)
+    return student.save()
 }).then(student => {
-	student.classes.$pull('Calculus')
-	student.save()
+    student.classes.$pull('Calculus')
+    student.save()
+}).catch(err => {
+    console.log()
 })
 ```
 
@@ -774,6 +796,8 @@ ko.models.Blog.create({
 }).then(blog => {
     console.log(blog.posts)
     // now contains the _id of the newly created BlogPost
+}).catch(err => {
+    console.log(err)
 })
 ```
 
@@ -792,6 +816,8 @@ number of models that matched the query.
 ko.models.Author.count({}).then(count => {
     console.log(count)
     // logs the total number of Author models
+}).catch(err => {
+    console.log()
 })
 ```
 
@@ -813,6 +839,8 @@ ko.models.User.findOne({username: 'milkperil'}).then(user => {
 }).then(deletedCount => {
     console.log(deletedCount)
     // this will be 1 if we succeeded
+}).catch(err => {
+    console.log(err)
 })
 ```
 
@@ -864,17 +892,17 @@ const User = ko.Model('User', {
     username: ko.String.range(2, 30), 
     password: Password,
     $$hooks: {
-		presave: (user, next) => {
-			if (user.isUpdated('password')) {
-				bcrypt.hash(user.password, saltRounds, function (err, hash) {
-					if (err) {
-						return next(err)
-					}
-					user.password = hash
-					next()
-				})
-			}
-		}
+        presave: (user, next) => {
+            if (user.isUpdated('password')) {
+                bcrypt.hash(user.password, saltRounds, function (err, hash) {
+                    if (err) {
+                        return next(err)
+                    }
+                    user.password = hash
+                    next()
+                })
+            }
+        }
     }
 })
 
@@ -887,7 +915,9 @@ User.create({
     user.username = 'Amy'
     return user.save()
 }).then(user => {
-    // the save will succeed even though the password is encrypted
+    // the save will succeed even though the password is encrypted and might otherwise fail validation
+}).catch(err => {
+    console.log()
 })
 ```
 Here we supply a named `presave` hook to be run any time the password is updated. Because
@@ -1091,7 +1121,7 @@ The MongoClient config looks like
     [password: 'password'],
     [address: 'localhost:27017'],
     [database: 'the_db]',
-	[url: 'mongodb://localhost:27017/the_db']
+    [url: 'mongodb://localhost:27017/the_db']
 }
 ```
 You can supply either the pieces of the connection string as properties (username, password, address, and database)
