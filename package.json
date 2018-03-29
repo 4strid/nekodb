@@ -1,10 +1,10 @@
 {
   "name": "nekodb",
-  "version": "1.1.2",
+  "version": "2.0.1",
   "description": "Tiny ODM for MongoDB/NeDB",
   "main": "ko.js",
   "scripts": {
-    "test": "tape ./test/test.js | tap-spec",
+    "test": "tape ./test/test.js | tap-spec --color",
     "coverage": "nyc tape ./test/test.js | tap-spec",
     "coverageHTML": "nyc report --reporter=html"
   },
