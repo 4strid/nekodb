@@ -462,7 +462,7 @@ user1.email = 'neko@nekodb.net'
 
 const user2 = ko.models.User.create({
     username: 'nekodb',
-    password: null,
+    password: undefined,
     email: 'neko@nekodb.net'
 })
 
@@ -513,7 +513,7 @@ Celebrity.findById('ps30L4dHbv9rLTln').then(celeb => {
 
 The basic structure of a query is an object with the fields to compare and either an expected
 value or comparison operators (`$lt`, `$lte`, `$gt`, `$gte`, `$in`, `$nin`, `$ne`). These can
-be combined with logical operators `$or`, `$and`, `$not` and `$where`.
+be combined with logical operators `$or`, `$and`, `$not` and `$nor`.
 
 Regex matches can be performed using the `$regex` operator.
 
@@ -532,16 +532,19 @@ ko.models.Celebrity.find({age: {$gte: 40}}).then(celebs => {
 })
 // logs all celebrities at least 40 years old
 
-const start2017 = new Date('2017-01-01')
-const end2017 = new Date('2018-01-01')
-
-ko.models.BlogPost.find({title: {$regex: /JavaScript/i},
-                         postDate: {$and: [{$gte: start2017}, {$lt: end2017}]}}).then(posts => {
+ko.models.BlogPost.find({
+    $and: [
+        {date: {$gte: '2017-01-01', $lt: '2018-01-01'}},
+		{$or: [
+			{title: {$regex: /JavaScript/i}},
+            {title: {$regex: /MongoDB/i}}
+		]}
+    ]
+}).then(posts => {
     posts.forEach(post => console.log(post))
 })
-
 // we specified two fields in this query: title and postDate
-// logs all blog posts whose titles contain "JavaScript" posted in 2017
+// logs all blog posts whose titles contain "JavaScript" or "MongoDB" posted in 2017
 ```
 
 For a more in depth explanation of the syntax, please refer to the documentation of the client
@@ -647,12 +650,10 @@ const Player = ko.Model('Player', {
 })
 
 Player.find({}).then(allPlayers => {
-    const saves = allPlayers.map(player => {
+    return Promise.all(allPlayers.map(player => {
         player.gold += 100
         return player.save()
-    })
-
-    return Promise.all(saves)
+    }))
 }).then(() => {
     // continue processing
 })
@@ -663,6 +664,11 @@ Using Array prototype methods (like `.push`, `.splice`, etc.) causes the whole a
 when saving to the database. Same goes for setting the field to a new array. To work more
 efficiently with arrays, you can use MongoDB's array manipulation update operators `$push`,
 `$pop`, `$addToSet`, and `$pull`, which are exposed as special methods on any array field.
+
+`$push` and `$addToSet` can be called multiple times; `$pop` and `$pull` can be called only once.
+
+MongoDB only allows one atomic operation per field for one update, so you can't mix more than one
+at once.
 
 #### $push
 Adds element(s) to the array. You can pass in either a single element or an array of elements
@@ -756,7 +762,7 @@ ko.models.Blog.create({
     console.log(blog.owner)
     // this will be the _id of the newly created Author model
     
-    blog.posts.push({
+    blog.posts.$push({
         title: 'My first blog',
         body: 'The content of the blog post',
         author: blog.owner
@@ -888,8 +894,10 @@ User.create({
 ```
 Here we supply a named `presave` hook to be run any time the password is updated. Because
 validation only occurs when a field is updated, even though the new password may or may not
-pass validation, you can still modify the model and save it as needed. Because we used a named
-hook (specifying which field it should run on) the password won't end up getting double encrypted.
+pass validation, you can still modify the model and save it as needed.
+
+We make sure not to double encrypt the password by specifying that it should only be updated if
+the `password` field is updated.
 
 To update the password, you need only set a new password on the model and the new password
 will be validated and encrypted.
