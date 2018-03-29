@@ -1097,6 +1097,16 @@ As it calls createIndex directly on the underlying MongoClient, it supports
 - `client` The underlying MongoClient powering the backend. Could be useful for testing.
 - `db` The underlying MongoDB database object. Could be useful for testing.
 
+Changelog
+---------
+### 1.1
+- Add `$push`, `$pop`, `$addToSet`, and `$pull` methods to array fields
+- Work more efficiently with arrays and embedded documents
+### 2.0 
+- Coerce types when setting values on an instance and when performing queries
+- Breaking: \_id field is of type ObjectID by default. To use another type you must specify it explicitly
+- Breaking: Removed named hooks. Replaced with `isUpdated` instance method
+
 Testing
 -------
 Although the project is still in its early stages, the code is reasonably well tested.
