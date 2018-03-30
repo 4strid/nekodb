@@ -199,6 +199,52 @@ function runTests (ko, next) {
 		})
 	})
 
+	test('Partial joining works when called as part of find', function (t) {
+		JoinModel.find({}).sort({_id: 1}).join({ref: {_id: 0}}).then(instances => {
+			t.pass('Join called without arguments')
+			t.deepEqual(instances, [
+				{
+					_id: 0,
+					ref: {
+						field: 'test value 0',
+					},
+					ref2: 0,
+				},
+				{
+					_id: 1,
+					ref: {
+						field: 'test value 1',
+					},
+					ref2: 1,
+				},
+			], 'All references were joined and have correct values')
+			t.end()
+		}).catch(err => {
+			t.error(err)
+			t.end()
+		})
+	})
+
+	test('Can partially join a model that contains an array of references', function (t) {
+		JoinArrModel.findOne({_id: 0}).join({refs: {_id: 0}}).then(instance => {
+			t.deepEqual(instance, {
+				_id: 0,
+				refs: [{
+					field: 'test value 0',
+				}, {
+					field: 'test value 1',
+				}, {
+					field: 'test value 2',
+				}],
+			}, 'All references were joined and have correct values')
+			t.end()
+		}).catch(err => {
+			console.error(err)
+			t.error(err)
+			t.end()
+		})
+	})
+
 	test('Can join a model that contains an array of references', function (t) {
 		JoinArrModel.findOne({_id: 0}).join().then(instance => {
 			t.deepEqual(instance, {
