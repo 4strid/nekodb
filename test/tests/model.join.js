@@ -155,6 +155,23 @@ function runTests (ko, next) {
 				},
 				ref2: 0,
 			}, 'Only specified references were joined and have correct values')
+			return JoinModel.findOne({_id: 0}, {ref: 1}).join()
+		}).then(instance => {
+			t.deepEqual(instance, {
+				_id: 0,
+				ref: {
+					_id: 0,
+					field: 'test value 0',
+				},
+			}, 'Joined a model while performing a projection')
+			return JoinModel.findOne({_id: 0}, {ref: 1}).join({ref: {_id: 0}})
+		}).then(instance => {
+			t.deepEqual(instance, {
+				_id: 0,
+				ref: {
+					field: 'test value 0',
+				},
+			}, 'Partially joined a model while performing a projection')
 		}).then(() => {
 			return JoinModel.findOne({_id: 100}).join(['ref'])
 		}).then(instance => {

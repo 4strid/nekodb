@@ -667,6 +667,9 @@ In this case, the model will not be able to be saved again because we omitted th
 If we did not omit the \_id field, it could be coerced back into a reference and could be saved
 after modifications.
 
+You cannot call `saveRefs` after performing a partial join; in fact, an error will be thrown if
+you attempt to do so.
+
 ## Updating models
 
 Updating is performed by first finding the model(s) to modify and then, since the `find` methods
@@ -1086,8 +1089,9 @@ A model instance. An object whose keys are field names and whose values are the 
 - `saveRefs()` Saves references that have been joined or embedded into Instances to the database.
 - `saveAll()` Saves the model and its Instance members to the database.
 - `delete()` Deletes the model from the database.
-- `join([Array fields])` Populates references on the specified fields to their full models. If
-*fields* is not supplied, joins all references on the model.
+- `join([Array fields]|[Object fields])` Populates references on the specified fields to their full models. If
+*fields* is not supplied, joins all references on the model. If *fields* is an object, performs
+the join(s) with the specified projections, returning only partially joined references.
 - `slice()` Returns a simple object (without prototype methods) that contains the data of the model.
 
 ### Cursor
@@ -1100,7 +1104,8 @@ descending.
 `skip` you can perform pagination.
 - `join([Array fields])` Populates each model returned by the query, replacing references with the
 full models they reference. Joins on specified *fields*. If fields is not supplied, joins all
-references.
+references. If *fields* is an object, performs the join(s) with the specified projections,
+returning only partially joined references.
 - `then(Function callback)` Executes the query and returns a Promise that resolves to the found
 models.
 - `toArray(Function callback)` Alias for `then()`

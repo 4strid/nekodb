@@ -286,10 +286,18 @@ function runTests (ko, next) {
 				_id: '1',
 				string: 'konnichi wa',
 			}, 'Updated reference')
-			t.end()
 		}).catch(err => {
-			console.error(err)
 			t.error(err)
+		}).then(() => {
+			return ModelWithRef.findOne({_id: '1'}).join({ref: {_id: 0}})
+		}).then(model => {
+			model.ref.string = 'bonjour'
+			return model.saveRefs()
+		}).then(() => {
+			t.fail('Saved a partially joined reference where it should have failed')
+			t.end()
+		}).catch(() => {
+			t.pass('Would not save a partially joined reference')
 			t.end()
 		})
 	})
