@@ -106,6 +106,29 @@ function runTests (ko, next) {
 		})
 	})
 
+	test('Partial joining works when called on instances', function (t) {
+		JoinModel.findOne({_id: 0}).then(instance => {
+			return instance.join({ref: {_id: 0}}).then(instance => {
+				t.pass('Join called with object argument')
+				t.deepEqual(instance, {
+					_id: 0,
+					ref: {
+						field: 'test value 0',
+					},
+					ref2: 0,
+				}, 'All references were joined and have correct values')
+			})
+		}).then(() => {
+			return JoinModel.findOne({_id: 0})
+		}).then(instance => {
+			t.equal(typeof instance.ref, 'number', 'Subsequent find returns original instance')
+			t.end()
+		}).catch(err => {
+			t.error(err)
+			t.end()
+		})
+	})
+
 	test('Joining works when called as part of findOne', function (t) {
 		JoinModel.findOne({_id: 0}).join().then(instance => {
 			t.pass('Join called without arguments')
@@ -132,6 +155,23 @@ function runTests (ko, next) {
 				},
 				ref2: 0,
 			}, 'Only specified references were joined and have correct values')
+			return JoinModel.findOne({_id: 0}, {ref: 1}).join()
+		}).then(instance => {
+			t.deepEqual(instance, {
+				_id: 0,
+				ref: {
+					_id: 0,
+					field: 'test value 0',
+				},
+			}, 'Joined a model while performing a projection')
+			return JoinModel.findOne({_id: 0}, {ref: 1}).join({ref: {_id: 0}})
+		}).then(instance => {
+			t.deepEqual(instance, {
+				_id: 0,
+				ref: {
+					field: 'test value 0',
+				},
+			}, 'Partially joined a model while performing a projection')
 		}).then(() => {
 			return JoinModel.findOne({_id: 100}).join(['ref'])
 		}).then(instance => {

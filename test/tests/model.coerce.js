@@ -167,21 +167,27 @@ function runTests (ko, next) {
 				arr: [1, 2, 3],
 			})
 			t.deepEqual(model.arr, [1, 2, 3], 'Values which do not need to be coerced remain ok')
+			await model.save()
 
 			model.arr = ['-1', '2', '3']
 			t.deepEqual(model.arr, [-1, 2, 3], 'Values are coerced when the array is set to a new array')
+			await model.save()
 
 			model.arr[3] = 4
 			t.deepEqual(model.arr, [-1, 2, 3, 4], 'Values which do not need to be coerced can be set on the array')
+			await model.save()
 
 			model.arr[0] = '5'
 			t.deepEqual(model.arr, [5, 2, 3, 4], 'Setting an array value coerces a string to a number')
+			await model.save()
 
 			model.arr.push('6')
 			t.deepEqual(model.arr, [5, 2, 3, 4, 6], 'Pushing a value performs coersion')
+			await model.save()
 
 			model.arr.$addToSet(['5', '7'])
 			t.deepEqual(model.arr, [5, 2, 3, 4, 6, 7], 'Array operator method $addToSet performs coersion')
+			await model.save()
 
 			model.arr.$push('8', {$position: 0, $slice: 4})
 			t.deepEqual(model.arr, [8, 5, 2, 3], 'Array operator method $push performs coersion')

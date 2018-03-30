@@ -504,21 +504,21 @@ Celebrity.find({age: 37}).then(celebs => {
         console.log(celeb)
     })
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 // returns all celebrity models with age = 37
 
 Celebrity.findOne({name: 'Kanye West'}).then(kanye => {
     console.log(kanye)
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 // finds one model whose name is 'Kanye West'
 
 Celebrity.findById('ps30L4dHbv9rLTln').then(celeb => {
     console.log(celeb)
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 // finds the model with the given _id
 ```
@@ -544,7 +544,7 @@ Using `{}` as a query returns all the documents.
 ko.models.Celebrity.find({age: {$gte: 40}}).then(celebs => {
     celebs.forEach(celeb => console.log(celeb))
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 // logs all celebrities at least 40 years old
 
@@ -559,7 +559,7 @@ ko.models.BlogPost.find({
 }).then(posts => {
     posts.forEach(post => console.log(post))
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 // we specified two fields in this query: title and postDate
 // logs all blog posts whose titles contain "JavaScript" or "MongoDB" posted in 2017
@@ -591,7 +591,7 @@ ko.models.BlogPost.find({}, {title: 1, _id: 0}).then(titles => {
     console.log(titles)
     // objects that only contain the title field
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 ```
 
@@ -646,9 +646,29 @@ Blog.find({}).join().then(blogs => {
     // every blog in the array contains a full Author model in the owner field,
     // and an array of full BlogPost models in the posts field
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 ```
+
+`join` can also be called with an object whose fields are the fields on the model to be joined,
+and whose values are projection queries specifying which fields of the reference to keep or
+omit.
+
+```javascript
+Blog.find({}).join({posts: {_id: 0, title: 1}}).then(blogs => {
+    console.log(blogs)
+	// the posts field will contain an array of partial posts, with only the title field
+	// the owner field will not be joined, only containing a reference
+}).catch(err => {
+	console.log(err)
+})
+```
+In this case, the model will not be able to be saved again because we omitted the \_id field.
+If we did not omit the \_id field, it could be coerced back into a reference and could be saved
+after modifications.
+
+You cannot call `saveRefs` after performing a partial join; in fact, an error will be thrown if
+you attempt to do so.
 
 ## Updating models
 
@@ -754,7 +774,7 @@ Student.create({
     student.classes.$pull('Calculus')
     student.save()
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 ```
 
@@ -817,7 +837,7 @@ ko.models.Author.count({}).then(count => {
     console.log(count)
     // logs the total number of Author models
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 ```
 
@@ -917,7 +937,7 @@ User.create({
 }).then(user => {
     // the save will succeed even though the password is encrypted and might otherwise fail validation
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 ```
 Here we supply a named `presave` hook to be run any time the password is updated. Because
@@ -1069,8 +1089,9 @@ A model instance. An object whose keys are field names and whose values are the 
 - `saveRefs()` Saves references that have been joined or embedded into Instances to the database.
 - `saveAll()` Saves the model and its Instance members to the database.
 - `delete()` Deletes the model from the database.
-- `join([Array fields])` Populates references on the specified fields to their full models. If
-*fields* is not supplied, joins all references on the model.
+- `join([Array fields]|[Object fields])` Populates references on the specified fields to their full models. If
+*fields* is not supplied, joins all references on the model. If *fields* is an object, performs
+the join(s) with the specified projections, returning only partially joined references.
 - `slice()` Returns a simple object (without prototype methods) that contains the data of the model.
 
 ### Cursor
@@ -1083,7 +1104,8 @@ descending.
 `skip` you can perform pagination.
 - `join([Array fields])` Populates each model returned by the query, replacing references with the
 full models they reference. Joins on specified *fields*. If fields is not supplied, joins all
-references.
+references. If *fields* is an object, performs the join(s) with the specified projections,
+returning only partially joined references.
 - `then(Function callback)` Executes the query and returns a Promise that resolves to the found
 models.
 - `toArray(Function callback)` Alias for `then()`
@@ -1144,6 +1166,10 @@ Changelog
 - Coerce types when setting values on an instance and when performing queries
 - Breaking: \_id field is of type ObjectID by default. To use another type you must specify it explicitly
 - Breaking: Removed named hooks. Replaced with `isUpdated` instance method
+### 2.1
+- Add support for performing projections while joining, or "partial joins"
+- Can join and project in the same query
+- Certain conditions were preventing array operators from running correctly
 
 Testing
 -------
