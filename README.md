@@ -1166,6 +1166,10 @@ Changelog
 - Coerce types when setting values on an instance and when performing queries
 - Breaking: \_id field is of type ObjectID by default. To use another type you must specify it explicitly
 - Breaking: Removed named hooks. Replaced with `isUpdated` instance method
+### 2.1
+- Add support for performing projections while joining, or "partial joins"
+- Can join and project in the same query
+- Certain conditions were preventing array operators from running correctly
 
 Testing
 -------
