@@ -504,21 +504,21 @@ Celebrity.find({age: 37}).then(celebs => {
         console.log(celeb)
     })
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 // returns all celebrity models with age = 37
 
 Celebrity.findOne({name: 'Kanye West'}).then(kanye => {
     console.log(kanye)
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 // finds one model whose name is 'Kanye West'
 
 Celebrity.findById('ps30L4dHbv9rLTln').then(celeb => {
     console.log(celeb)
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 // finds the model with the given _id
 ```
@@ -544,7 +544,7 @@ Using `{}` as a query returns all the documents.
 ko.models.Celebrity.find({age: {$gte: 40}}).then(celebs => {
     celebs.forEach(celeb => console.log(celeb))
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 // logs all celebrities at least 40 years old
 
@@ -559,7 +559,7 @@ ko.models.BlogPost.find({
 }).then(posts => {
     posts.forEach(post => console.log(post))
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 // we specified two fields in this query: title and postDate
 // logs all blog posts whose titles contain "JavaScript" or "MongoDB" posted in 2017
@@ -591,7 +591,7 @@ ko.models.BlogPost.find({}, {title: 1, _id: 0}).then(titles => {
     console.log(titles)
     // objects that only contain the title field
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 ```
 
@@ -646,9 +646,26 @@ Blog.find({}).join().then(blogs => {
     // every blog in the array contains a full Author model in the owner field,
     // and an array of full BlogPost models in the posts field
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 ```
+
+`join` can also be called with an object whose fields are the fields on the model to be joined,
+and whose values are projection queries specifying which fields of the reference to keep or
+omit.
+
+```javascript
+Blog.find({}).join({posts: {_id: 0, title: 1}}).then(blogs => {
+    console.log(blogs)
+	// the posts field will contain an array of partial posts, with only the title field
+	// the owner field will not be joined, only containing a reference
+}).catch(err => {
+	console.log(err)
+})
+```
+In this case, the model will not be able to be saved again because we omitted the \_id field.
+If we did not omit the \_id field, it could be coerced back into a reference and could be saved
+after modifications.
 
 ## Updating models
 
@@ -754,7 +771,7 @@ Student.create({
     student.classes.$pull('Calculus')
     student.save()
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 ```
 
@@ -817,7 +834,7 @@ ko.models.Author.count({}).then(count => {
     console.log(count)
     // logs the total number of Author models
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 ```
 
@@ -917,7 +934,7 @@ User.create({
 }).then(user => {
     // the save will succeed even though the password is encrypted and might otherwise fail validation
 }).catch(err => {
-    console.log()
+    console.log(err)
 })
 ```
 Here we supply a named `presave` hook to be run any time the password is updated. Because
