@@ -124,6 +124,7 @@ function runTests (ko, next) {
 			t.equal(typeof instance.ref, 'number', 'Subsequent find returns original instance')
 			t.end()
 		}).catch(err => {
+			console.error(err)
 			t.error(err)
 			t.end()
 		})
