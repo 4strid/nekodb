@@ -1170,6 +1170,7 @@ Changelog
 - Add support for performing projections while joining, or "partial joins"
 - Can join and project in the same query
 - Certain conditions were preventing array operators from running correctly
+- Use deepEqual comparison when determining which elements to $pull
 
 Testing
 -------
