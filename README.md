@@ -15,6 +15,81 @@ NekoDB comes with NeDB built in, so you can access a Mongo-like database, withou
 installing or running a database at all. NeDB is suitable for datasets in the range of tens of
 thousands of documents. For larger datasets, it is recommended you upgrade to MongoDB.
 
+Jump To
+-------
+- [Connecting to a backend](#connecting-to-a-backend)
+  * [NeDB](#nedb)
+  * [MongoDB](#mongodb)
+- [Creating Models](#creating-schemas)
+  * [Typeclasses](#typeclasses)
+  * [Array fields](#array-fields-and-multi-type-fields)
+  * [Multi-type fields](#array-fields-and-multi-type-fields)
+  * [Embedded documents](#embedded-documents)
+  * [Constants](#constants)
+  * [Length limited strings](#length-limited-strings)
+  * [Validators](#validators)
+  * [Default Values](#values)
+  * [References](#references)
+    - [Embedding models](#embedding-models)
+  * [Utility Typeclasses](#utility-typeclasses)
+- [Creating models](#creating-models)
+- [Logging models](#instance-slice)
+- [Finding models](#finding-models-1)
+  * [Query syntax](#query-syntax)
+    + [Basic queries](#basic-queries)
+    + [Comparison and logical operators](#comparison-and-logical-operators)
+  * [Projections](#projections)
+  * [Cursor methods](#cursor-methods)
+    + [Sorting](#sorting)
+    + [Paginating](#paginating)
+    + [Joining references](#joining-references)
+- [Updating models](#updating-models)
+  * [Array operator methods](#array-operator-methods)
+    + [$push](#-push)
+    + [$pop](#-pop)
+    + [$addToSet](#-addtoset)
+    + [$pull](#-pull)
+  * [Saving joined models](#saving-joined-models)
+    + [Creating models with saveRefs() / saveAll()](#creating-models-with-saverefs-----saveall--)
+  * [Where is Model.update() ?](#where-is-modelupdate----)
+- [Counting models](#counting-models)
+- [Deleting models](#deleting-models)
+- [Hooks](#hooks)
+  * [oncreate](#oncreate)
+  * [prevalidate](#prevalidate)
+  * [postvalidate](#postvalidate)
+  * [presave](#presave)
+  * [postsave](#postsave)
+  * [predelete](#predelete)
+  * [postdelete](#postdelete)
+- [Indexing](#indexing)
+
+
+- [API Reference](#api-reference)
+  * [ko](#ko)
+  * [Validators](#typeclass)
+    + [ko.Number](#konumber)
+    + [ko.String](#kostring)
+    + [ko.Boolean](#koboolean)
+    + [ko.Date](#kodate)
+    + [ko.null](#konull)
+    + [ko.Array(type)](#koarray-type-)
+    + [ko.Option(Array types)](#kooption-array-types-)
+    + [ko.Document(Object schema)](#kodocument-object-schema-)
+  * [Model](#model)
+  * [Instance](#instance)
+  * [Cursor](#cursor)
+  * [NeDBClient(Object config)](#nedbclient-object-config-)
+  * [MongoClient(Object config)](#mongoclient-object-config-)
+- [Changelog](#changelog)
+- [Testing](#testing)
+- [Contact](#contact)
+
+
+- Common Hiccups
+  * [ko.Model is not a function](https://github.com/cutejs/nekodb#you-must-call-koconnect-before-creating-your-models-or-you-will-get-the-error-defined)
+  * [Program hangs on model.save()](https://github.com/cutejs/nekodb#hooks)
+
 Quick Intro
 ===========
 
@@ -207,7 +282,6 @@ const User = ko.Model('User', {
 })
 ```
 
-
 The first argument to `ko.Model` is the name of the model, which is the name of the collection
 and the property name with which it will be attached to `ko.models`.
 
@@ -224,7 +298,19 @@ The `_id` field is automatically added to every model, expecting a type of Objec
 and saved by the database. If you intend to use a different type of \_id that you will supply
 yourself, you must specify so explicitly.
 
-### Builtin types
+```javascript
+const Model = ko.Model('Model', {
+    _id: ko.String,
+    name: ko.String
+})
+```
+In this example, we're going to set our own \_id fields and they are expected to be strings.
+
+### Required by default
+Fields specified in a schema are considered required by default. See [optional fields](#optional-fields)
+for how to make a field optional.
+
+### Built-in types
 
 The supported JavaScript types are:
 
@@ -236,6 +322,7 @@ The supported JavaScript types are:
 - `Object`
 - `null`
 
+### Typeclasses
 We refer to them by their Ko Typeclasses. The available typeclasses are:
 
 - `ko.String`
@@ -247,6 +334,21 @@ We refer to them by their Ko Typeclasses. The available typeclasses are:
 - `ko.Document`
 - `ko.null`
 
+```javascript
+const AllTypesModel = ko.Model('AllTypesModel', {
+    string: ko.String,
+    number: ko.Number,
+    boolean: ko.Boolean,
+    date: ko.Date,
+    array: ko.Array(ko.Number) // an array of numbers
+    option: ko.Option([ko.Number, ko.String]) // either a string or a number
+    embedded: ko.Document({
+        subfield: ko.String
+    }),
+    null: ko.null // expected to be null or undefined
+})
+```
+
 ### Shorthands
 
 Rather than using `ko.Array`, `ko.Option`, `ko.Document`, or `ko.null`, directly, there are
@@ -257,6 +359,8 @@ typeclass. To specify a field that can contain varying types, pass an array cont
 than one typeclass. These can be nested. To create an array whose elements can be of differing
 types, supply an array containing the array of options.
 
+#### Array fields and multi-type fields
+
 ```javascript
 const Model = ko.Model('Model', {
     array: [ko.Number],              // field must be an array of numbers
@@ -264,6 +368,8 @@ const Model = ko.Model('Model', {
     optArr: [[ko.Number, ko.String]] // field must be an array of strings or numbers
 })
 ```
+
+#### Optional fields
 
 To specify that a field should be null, you can just use `null` in lieu of a typeclass. To make
 a field optional, you can either pass an option array containing the desired type and null, or
@@ -322,7 +428,7 @@ const MaxLength = ko.Model('MaxLength', {
 
 ### Validators
 
-In addition to checking the type, each builtin typeclass contains a number of validator methods
+In addition to checking the type, each built-in typeclass contains a number of validator methods
 that can perform more specific validation. Length limiting strings is one example. These are
 called as methods on the typeclass, and return a new typeclass.
 
@@ -359,7 +465,7 @@ const MovieReview = ko.Model('MovieReview', {
 })
 ```
 
-The full list of validators available is found below in the API reference.
+The full list of validators available is found below in the [API reference](#typeclass).
 
 ### Values
 
@@ -486,6 +592,11 @@ user2.save().catch(errors => {
 })
 ```
 
+## instance.slice
+Since every instance uses getters/setters to determine which fields have been updated, console.log-ing them
+directly does not yield very interesting results. Every instance has a method called `slice` which converts
+it into a basic object that you can log and JSON.stringify.
+
 ## Finding models
 
 To retrieve models from the database use the Model `find`, `findOne`, or `findById` methods.
@@ -501,7 +612,7 @@ const Celebrity = ko.models.Celebrity
 
 Celebrity.find({age: 37}).then(celebs => {
     celebs.forEach(celeb => {
-        console.log(celeb)
+        console.log(celeb.slice())
     })
 }).catch(err => {
     console.log(err)
@@ -509,14 +620,14 @@ Celebrity.find({age: 37}).then(celebs => {
 // returns all celebrity models with age = 37
 
 Celebrity.findOne({name: 'Kanye West'}).then(kanye => {
-    console.log(kanye)
+    console.log(kanye.slice())
 }).catch(err => {
     console.log(err)
 })
 // finds one model whose name is 'Kanye West'
 
 Celebrity.findById('ps30L4dHbv9rLTln').then(celeb => {
-    console.log(celeb)
+    console.log(celeb.slice())
 }).catch(err => {
     console.log(err)
 })
@@ -542,7 +653,7 @@ Using `{}` as a query returns all the documents.
 
 ```javascript
 ko.models.Celebrity.find({age: {$gte: 40}}).then(celebs => {
-    celebs.forEach(celeb => console.log(celeb))
+    celebs.forEach(celeb => console.log(celeb.slice()))
 }).catch(err => {
     console.log(err)
 })
@@ -557,7 +668,7 @@ ko.models.BlogPost.find({
         ]}
     ]
 }).then(posts => {
-    posts.forEach(post => console.log(post))
+    posts.forEach(post => console.log(post.slice()))
 }).catch(err => {
     console.log(err)
 })
@@ -826,7 +937,7 @@ ko.models.Blog.create({
 Currently you can't use either client's native `update` methods as they would bypass validation.
 This will be supported in a later version.
 
-## Counting Models
+## Counting models
 
 To count the number of documents matching a query, use the Model `count` method, which takes
 the same kind of query as the `find` methods. `count` returns a Promise that resolves to the
@@ -841,7 +952,7 @@ ko.models.Author.count({}).then(count => {
 })
 ```
 
-## Deleting Models
+## Deleting models
 
 You can delete a model two ways: using the Model methods `deleteOne`, `deleteMany`, or
 `deleteById`, or by calling `delete()` on a model instance.
@@ -956,6 +1067,9 @@ You can specify indexes on fields by adding an `$$index` field to a schema or by
 `createIndex` on a Model. Indexes help speed up performance by reducing the amount of
 elements the database must check, and can also be used to specify uniqueness constraints.
 
+You should essentially have an index on any field you intend to search by or sort by, to avoid
+having to scan all the elements in a collection.
+
 See [Indexes in MongoDB](https://docs.mongodb.com/manual/indexes/) for more information on
 what indexes are and why you might want to use them.
 
@@ -975,6 +1089,8 @@ const User = ko.Model('User', {
 ```
 
 Now an error will be thrown if we attempt to create two users with the same username.
+
+See [client index sections](#nedbclient-object-config) for what indexes are avaialable to each client.
 
 API Reference
 =============
@@ -1130,7 +1246,7 @@ available options are:
   * `unique` (optional, defaults to false) enforces uniqueness on the field.
   * `sparse` (optional, defaults to false) does not index documents on which the field is not
 defined.
-  * 'expireAfterSeconds(Number seconds)' Removes documents from the database when the system time
+  * `expireAfterSeconds(Number seconds)` Removes documents from the database when the system time
 exceeds the value of the field + *seconds*. Documents where the field is not defined or not a date
 are ignored.
 
