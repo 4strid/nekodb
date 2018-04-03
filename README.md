@@ -32,8 +32,8 @@ Jump To
 - [References](#references)
   - [Embedding models](#embedding-models)
 - [Utility Typeclasses](#utility-typeclasses)
-#### [Creating models](#creating-models-1)
-#### [Logging models](#instance-slice-1)
+#### [Creating models](#creating-models-2)
+#### [Logging models](#instanceslice)
 #### [Finding models](#finding-models-2)
 - [Query syntax](#query-syntax)
   - [Basic queries](#basic-queries)
@@ -45,13 +45,13 @@ Jump To
   - [Joining references](#joining-references)
 #### [Updating models](#updating-models-1)
 - [Array operator methods](#array-operator-methods)
-  - [$push](#-push)
-  - [$pop](#-pop)
-  - [$addToSet](#-addtoset)
-  - [$pull](#-pull)
+  - [$push](#push)
+  - [$pop](#pop)
+  - [$addToSet](#addtoset)
+  - [$pull](#pull)
 - [Saving joined models](#saving-joined-models)
-  - [Creating models with saveRefs() / saveAll()](#creating-models-with-saverefs-----saveall--)
-- [Where is Model.update() ?](#where-is-modelupdate----)
+  - [Creating models with saveRefs() / saveAll()](#creating-models-with-saverefs--saveall)
+- [Where is Model.update() ?](#where-is-modelupdate-)
 #### [Counting models](#counting-models-1)
 #### [Deleting models](#deleting-models-1)
 #### [Hooks](#hooks)
@@ -73,14 +73,14 @@ Jump To
   - [ko.Boolean](#koboolean)
   - [ko.Date](#kodate)
   - [ko.null](#konull)
-  - [ko.Array(type)](#koarray-type-)
-  - [ko.Option(Array types)](#kooption-array-types-)
-  - [ko.Document(Object schema)](#kodocument-object-schema-)
+  - [ko.Array(type)](#koarraytype)
+  - [ko.Option(Array types)](#kooptionarray-types)
+  - [ko.Document(Object schema)](#kodocumentobject-schema)
 - [Model](#model)
 - [Instance](#instance)
 - [Cursor](#cursor)
-- [NeDBClient(Object config)](#nedbclient-object-config-)
-- [MongoClient(Object config)](#mongoclient-object-config-)
+- [NeDBClient(Object config)](#nedbclientobject-config)
+- [MongoClient(Object config)](#mongoclientobject-config)
 
 
 #### [Changelog](#changelog-1)
@@ -1096,7 +1096,7 @@ const User = ko.Model('User', {
 
 Now an error will be thrown if we attempt to create two users with the same username.
 
-See [client index sections](#nedbclient-object-config) for what indexes are avaialable to each client.
+See [client index sections](#nedbclientobject-config) for what indexes are avaialable to each client.
 
 API Reference
 =============
