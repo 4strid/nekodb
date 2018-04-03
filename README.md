@@ -17,7 +17,7 @@ thousands of documents. For larger datasets, it is recommended you upgrade to Mo
 
 Jump To
 -------
-#### [Connecting to a backend](#connecting-to-a-backend)
+#### [Connecting to a backend](#connecting-to-a-backend-1)
 - [NeDB](#nedb)
 - [MongoDB](#mongodb)
 #### [Creating Models](#creating-schemas)
@@ -32,9 +32,9 @@ Jump To
 - [References](#references)
   - [Embedding models](#embedding-models)
 - [Utility Typeclasses](#utility-typeclasses)
-#### [Creating models](#creating-models)
-#### [Logging models](#instance-slice)
-#### [Finding models](#finding-models-1)
+#### [Creating models](#creating-models-1)
+#### [Logging models](#instance-slice-1)
+#### [Finding models](#finding-models-2)
 - [Query syntax](#query-syntax)
   - [Basic queries](#basic-queries)
   - [Comparison and logical operators](#comparison-and-logical-operators)
@@ -43,7 +43,7 @@ Jump To
   - [Sorting](#sorting)
   - [Paginating](#paginating)
   - [Joining references](#joining-references)
-#### [Updating models](#updating-models)
+#### [Updating models](#updating-models-1)
 - [Array operator methods](#array-operator-methods)
   - [$push](#-push)
   - [$pop](#-pop)
@@ -52,8 +52,8 @@ Jump To
 - [Saving joined models](#saving-joined-models)
   - [Creating models with saveRefs() / saveAll()](#creating-models-with-saverefs-----saveall--)
 - [Where is Model.update() ?](#where-is-modelupdate----)
-#### [Counting models](#counting-models)
-#### [Deleting models](#deleting-models)
+#### [Counting models](#counting-models-1)
+#### [Deleting models](#deleting-models-1)
 #### [Hooks](#hooks)
 - [oncreate](#oncreate)
 - [prevalidate](#prevalidate)
@@ -62,10 +62,10 @@ Jump To
 - [postsave](#postsave)
 - [predelete](#predelete)
 - [postdelete](#postdelete)
-#### [Indexing](#indexing)
+#### [Indexing](#indexing-1)
 
 
-#### [API Reference](#api-reference)
+#### [API Reference](#api-reference-1)
 - [ko](#ko)
 - [Validators](#typeclass)
   - [ko.Number](#konumber)
@@ -83,9 +83,9 @@ Jump To
 - [MongoClient(Object config)](#mongoclient-object-config-)
 
 
-#### [Changelog](#changelog)
-#### [Testing](#testing)
-#### [Contact](#contact)
+#### [Changelog](#changelog-1)
+#### [Testing](#testing-1)
+#### [Contact](#contact-1)
 
 
 #### Common Hiccups
