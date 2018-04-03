@@ -54,7 +54,7 @@ Jump To
 - [Where is Model.update() ?](#where-is-modelupdate-)
 #### [Counting models](#counting-models-1)
 #### [Deleting models](#deleting-models-1)
-#### [Hooks](#hooks)
+#### [Hooks](#hooks-1)
 - [oncreate](#oncreate)
 - [prevalidate](#prevalidate)
 - [postvalidate](#postvalidate)
