@@ -391,7 +391,21 @@ const BlogPost = ko.Model('BlogPost', {
     author: Author,
     postDate: ko.Date.today()
 })
+
+Author.create({
+    name: 'Darwood',
+    email: 'dmarvin@nekodb.net'
+}).save().then(author => {
+	BlogPost.create({
+        title: 'Why good documentation matters',
+        body: 'If you forget to document certain features, users will have a hard time...',
+        author: author._id
+    })
+})
 ```
+When creating an instance of a Model containing a reference, pass in the \_id of the referenced
+model. When you perform a find, the reference can be resolved using `join`. (See
+[joining references](#joining-references))
 
 To reference a Model that has not been created yet, or to reference it without access to 
 the variable it was saved to (for instance, if requiring it would cause a circular dependency)
