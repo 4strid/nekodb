@@ -15,6 +15,84 @@ NekoDB comes with NeDB built in, so you can access a Mongo-like database, withou
 installing or running a database at all. NeDB is suitable for datasets in the range of tens of
 thousands of documents. For larger datasets, it is recommended you upgrade to MongoDB.
 
+Jump To
+-------
+#### [Quickstart guide](#quick-intro)
+#### [Connecting to a backend](#connecting-to-a-backend-1)
+- [NeDB](#nedb)
+- [MongoDB](#mongodb)
+#### [Creating Models](#creating-schemas)
+- [Typeclasses](#typeclasses)
+- [Array fields](#array-fields-and-multi-type-fields)
+- [Multi-type fields](#array-fields-and-multi-type-fields)
+- [Embedded documents](#embedded-documents)
+- [Constants](#constants)
+- [Length limited strings](#length-limited-strings)
+- [Validators](#validators)
+- [Default Values](#values)
+- [References](#references)
+  - [Embedding models](#embedding-models)
+- [Utility Typeclasses](#utility-typeclasses)
+#### [Creating models](#creating-models-2)
+#### [Logging models](#instanceslice)
+#### [Finding models](#finding-models-2)
+- [Query syntax](#query-syntax)
+  - [Basic queries](#basic-queries)
+  - [Comparison and logical operators](#comparison-and-logical-operators)
+- [Projections](#projections)
+- [Cursor methods](#cursor-methods)
+  - [Sorting](#sorting)
+  - [Paginating](#paginating)
+  - [Joining references](#joining-references)
+#### [Updating models](#updating-models-1)
+- [Array operator methods](#array-operator-methods)
+  - [$push](#push)
+  - [$pop](#pop)
+  - [$addToSet](#addtoset)
+  - [$pull](#pull)
+- [Saving joined models](#saving-joined-models)
+  - [Creating models with saveRefs() / saveAll()](#creating-models-with-saverefs--saveall)
+- [Where is Model.update() ?](#where-is-modelupdate-)
+#### [Counting models](#counting-models-1)
+#### [Deleting models](#deleting-models-1)
+#### [Hooks](#hooks-1)
+- [oncreate](#oncreate)
+- [prevalidate](#prevalidate)
+- [postvalidate](#postvalidate)
+- [presave](#presave)
+- [postsave](#postsave)
+- [predelete](#predelete)
+- [postdelete](#postdelete)
+#### [Indexing](#indexing-1)
+
+
+#### [API Reference](#api-reference-1)
+- [ko](#ko)
+- [Validators](#typeclass)
+  - [ko.Number](#konumber)
+  - [ko.String](#kostring)
+  - [ko.Boolean](#koboolean)
+  - [ko.Date](#kodate)
+  - [ko.null](#konull)
+  - [ko.Array(type)](#koarraytype)
+  - [ko.Option(Array types)](#kooptionarray-types)
+  - [ko.Document(Object schema)](#kodocumentobject-schema)
+- [Model](#model)
+- [Instance](#instance)
+- [Cursor](#cursor)
+- [NeDBClient(Object config)](#nedbclientobject-config)
+- [MongoClient(Object config)](#mongoclientobject-config)
+
+
+#### [Changelog](#changelog-1)
+#### [Testing](#testing-1)
+#### [Contact](#contact-1)
+
+
+#### Common Hiccups
+  * [ko.Model is not a function](https://github.com/cutejs/nekodb#you-must-call-koconnect-before-creating-your-models-or-you-will-get-the-error-defined)
+  * [Program hangs on model.save()](https://github.com/cutejs/nekodb#hooks)
+
 Quick Intro
 ===========
 
@@ -128,84 +206,6 @@ Instance {
 Detailed Guide
 ==============
 
-Jump To
--------
-#### [Connecting to a backend](#connecting-to-a-backend-1)
-- [NeDB](#nedb)
-- [MongoDB](#mongodb)
-#### [Creating Models](#creating-schemas)
-- [Typeclasses](#typeclasses)
-- [Array fields](#array-fields-and-multi-type-fields)
-- [Multi-type fields](#array-fields-and-multi-type-fields)
-- [Embedded documents](#embedded-documents)
-- [Constants](#constants)
-- [Length limited strings](#length-limited-strings)
-- [Validators](#validators)
-- [Default Values](#values)
-- [References](#references)
-  - [Embedding models](#embedding-models)
-- [Utility Typeclasses](#utility-typeclasses)
-#### [Creating models](#creating-models-2)
-#### [Logging models](#instanceslice)
-#### [Finding models](#finding-models-2)
-- [Query syntax](#query-syntax)
-  - [Basic queries](#basic-queries)
-  - [Comparison and logical operators](#comparison-and-logical-operators)
-- [Projections](#projections)
-- [Cursor methods](#cursor-methods)
-  - [Sorting](#sorting)
-  - [Paginating](#paginating)
-  - [Joining references](#joining-references)
-#### [Updating models](#updating-models-1)
-- [Array operator methods](#array-operator-methods)
-  - [$push](#push)
-  - [$pop](#pop)
-  - [$addToSet](#addtoset)
-  - [$pull](#pull)
-- [Saving joined models](#saving-joined-models)
-  - [Creating models with saveRefs() / saveAll()](#creating-models-with-saverefs--saveall)
-- [Where is Model.update() ?](#where-is-modelupdate-)
-#### [Counting models](#counting-models-1)
-#### [Deleting models](#deleting-models-1)
-#### [Hooks](#hooks-1)
-- [oncreate](#oncreate)
-- [prevalidate](#prevalidate)
-- [postvalidate](#postvalidate)
-- [presave](#presave)
-- [postsave](#postsave)
-- [predelete](#predelete)
-- [postdelete](#postdelete)
-#### [Indexing](#indexing-1)
-
-
-#### [API Reference](#api-reference-1)
-- [ko](#ko)
-- [Validators](#typeclass)
-  - [ko.Number](#konumber)
-  - [ko.String](#kostring)
-  - [ko.Boolean](#koboolean)
-  - [ko.Date](#kodate)
-  - [ko.null](#konull)
-  - [ko.Array(type)](#koarraytype)
-  - [ko.Option(Array types)](#kooptionarray-types)
-  - [ko.Document(Object schema)](#kodocumentobject-schema)
-- [Model](#model)
-- [Instance](#instance)
-- [Cursor](#cursor)
-- [NeDBClient(Object config)](#nedbclientobject-config)
-- [MongoClient(Object config)](#mongoclientobject-config)
-
-
-#### [Changelog](#changelog-1)
-#### [Testing](#testing-1)
-#### [Contact](#contact-1)
-
-
-#### Common Hiccups
-  * [ko.Model is not a function](https://github.com/cutejs/nekodb#you-must-call-koconnect-before-creating-your-models-or-you-will-get-the-error-defined)
-  * [Program hangs on model.save()](https://github.com/cutejs/nekodb#hooks)
-
-----------------------------------
 
 ## Connecting to a backend
 
