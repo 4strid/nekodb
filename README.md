@@ -64,6 +64,8 @@ Jump To
 - [predelete](#predelete)
 - [postdelete](#postdelete)
 #### [Indexing](#indexing-1)
+- [unique fields](#unique-fields)
+#### [Type coercion](#type-coercion-1)
 
 
 #### [API Reference](#api-reference-1)
@@ -1098,6 +1100,8 @@ what indexes are and why you might want to use them.
 Creating an index directly calls the client's own index creation mechanism, so the full power
 of MongoDB or NeDB indexes are at your disposal.
 
+### Unique fields
+
 ```javascript
 const User = ko.Model('User', {
     username: ko.String,
@@ -1113,6 +1117,52 @@ const User = ko.Model('User', {
 Now an error will be thrown if we attempt to create two users with the same username.
 
 See [client index sections](#nedbclientobject-config) for what indexes are avaialable to each client.
+
+## Type coercion
+
+When setting values on an instance or making a query, type coersion will be performed to make
+the values match those expected by the fields. The string literals `'true'` and `'false'` will
+be coerced to `true` and `false` if the field expects a Boolean. Otherwise, native JavaScript
+type coercion is performed on the value. For dates, the `Date` constructor is called, allowing
+you to pass a wide variety of date formats in.
+
+For fields where multiple types were declared, the first type declared is what will be used for
+coercion. For optional fields, type coercion will be performed unless the value is `null` in
+which case it will remain `null` rather than be coerced. String `'null'` is coerced to `null`.
+
+```javascript
+const CoerceModel = ko.Model('CoerceModel', {
+    number: ko.Number,
+    optional: ko.Number.optional(),
+    multitype: [ko.Number, ko.String],
+    date: ko.Date
+})
+
+const model = CoerceModel.create({
+    number: '100',
+    optional: '25',
+    multitype: '40',
+    date: '2018-04-07'
+})
+
+console.log(model.slice())
+// number: 100,
+// optional: 25,
+// multitype: 40,
+// date: 2018-04-07T00:00:00.000Z
+
+model.save().then(() => {
+    return CoerceModel.findById(model._id.toString())
+}).then(found => {
+    console.log(found.slice())
+    found.optional = null
+    return found.save()
+}).then(() => {
+    return CoerceModel.findOne({optional: 'null'})
+}).then(found => {
+    console.log(found.slice())
+})
+```
 
 API Reference
 =============
@@ -1309,6 +1359,8 @@ Changelog
 - Can join and project in the same query
 - Certain conditions were preventing array operators from running correctly
 - Use deepEqual comparison when determining which elements to $pull
+### 2.2
+- Type coersion works for option types (including optional fields)
 
 Testing
 -------
