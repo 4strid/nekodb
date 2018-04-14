@@ -313,6 +313,40 @@ function runTests (ko, next) {
 		t.end()
 	})
 
+	test('Coercing option types', async t => {
+
+		const OptionModel = ko.Model('ko_db_test_coerce_option', {
+			optional: ko.Number.optional(),
+			number: [ko.Number, ko.String],
+			string: [ko.String, ko.Number],
+		})
+
+		try {
+			const model = OptionModel.create()
+
+			model.optional = '123'
+			t.equal(model.optional, 123, 'Optional number coerced from string to number')
+			model.optional = null
+			t.equal(model.optional, null, 'Null value is not coerced')
+			model.optional = 'null'
+			t.equal(model.optional, null, 'String \'null\' is coerced to null')
+			model.number = '123'
+			t.equal(model.number, 123, 'Option with leading Number type is coerced to number')
+			model.string = 123
+			t.equal(model.string, '123', 'Option with leading String type is coerced to string')
+			await model.save()
+
+			let count = await OptionModel.count({optional: 'null'})
+			t.equal(count, 1, 'Coerced string null to null in query')
+			count = await OptionModel.count({number: '123'})
+			t.equal(count, 1, 'Coerced string to number in query')
+		} catch (err) {
+			t.error(err)
+		}
+
+		t.end()
+	})
+
 	test('Coercing references by objectID', async t => {
 		const ReferencedModelObjectID = ko.Model('ko_db_test_coerce_refd_obj', {
 			field: ko.String,
