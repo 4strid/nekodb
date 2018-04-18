@@ -31,23 +31,19 @@ function runTests (ko, next) {
 				JoinModel.create({_id: 0, ref: 0, ref2: 0}),
 				JoinModel.create({_id: 1, ref: 1, ref2: 1}),
 			].map(doc => doc.save()))
-		})
-		.then(() => {
+		}).then(() => {
 			return JoinArrModel.create({
 				_id: 0,
 				refs: [0, 1, 2],
 			}).save()
-		})
-		.then(() => {
+		}).then(() => {
 			return JoinArrModel.create({
 				_id: 1,
 				refs: [],
 			}).save()
-		})
-		.then(() => {
+		}).then(() => {
 			t.end()
-		})
-		.catch(err => {
+		}).catch(err => {
 			console.error('Ran into an error creating test models!')
 			t.error(err)
 			t.end()

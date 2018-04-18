@@ -178,8 +178,7 @@ function runTests (ko, next) {
 			return ko.models.ko_db_test_test5_2.create({
 				ref: ref._id
 			}).save()
-		})
-		.then(doc => {
+		}).then(doc => {
 			t.pass('Successfully created document')
 			t.end()
 		}).catch(err => {
