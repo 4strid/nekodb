@@ -92,8 +92,8 @@ Jump To
 
 
 #### Common Hiccups
-  * [ko.Model is not a function](https://github.com/cutejs/nekodb#you-must-call-koconnect-before-creating-your-models)
-  * [Program hangs on model.save()](#you-must-always-call-next)
+  * [ko.Model is not a function](https://github.com/cutejs/nekodb#you-must-call-koconnect-before-creating-your-models-or-you-will-get-the-error-defined)
+  * [Program hangs on model.save()](https://github.com/cutejs/nekodb#hooks)
 
 Quick Intro
 ===========
@@ -271,9 +271,7 @@ Though they are executed in order, there's no way to guarantee that they finish 
 need the results of one call in a subsequent call you should still use a Promise chain to order
 your calls.
 
-### You must call ko.connect before creating your models
-Before you can create a Model, you must call ko.connect or you will get the error "ko.models is
-not a function" or "ko.Model is not a function"
+#### You must call ko.connect before creating your models or you will get the error "defined"
 
 ## Creating schemas
 
@@ -1006,8 +1004,7 @@ You can inject code to be run before and after certain steps of saving a model t
 Your hook will be called with two arguments: the instance and a `next()` function you call when
 you're finished with your hook. You can also return a Promise rather than call `next()`.
 
-### You must always call next()
-You must always call `next()` or return a Promise or your program will hang on saving.
+#### You must always call next() or your program will hang when saving.
 
 You can add hooks two ways. First is by including a $$hooks property on your schema when you
 define your model, where the keys are the names of the hooks to be added and the values are the

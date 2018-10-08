@@ -19,10 +19,10 @@ function runTests (ko, next) {
 			}).save()
 		}).then(() => {
 			t.fail('Model creation succeeded where it should have failed')
-			return IndexModel.count({})
+			return IndexModel.estimatedDocumentCount({})
 		}).catch(() => {
 			t.pass('Did not create repeated model')
-			return IndexModel.count({})
+			return IndexModel.estimatedDocumentCount({})
 		}).then(count => {
 			t.equal(count, 1, 'Only created one instance of the model')
 			t.end()

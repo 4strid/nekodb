@@ -54,7 +54,7 @@ function runTests (ko, next) {
 			refs: [Ref],
 		})
 
-		Model.count({}).then(count => {
+		Model.countDocuments({}).then(count => {
 			t.equal(count, 1, 'Counted documents')
 		}).catch(err => {
 			t.error(err)

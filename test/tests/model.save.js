@@ -11,7 +11,7 @@ function runTests (ko, next) {
 		}).save().then(simple => {
 			t.equal('_id' in simple, true, 'Instance assigned an _id when not specified')
 			t.equal(simple.string, 'ok', 'Instance has correct field')
-			return SimpleModel.count({})
+			return SimpleModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 1, 'Count incremented after creation')
 			t.end()
@@ -32,7 +32,7 @@ function runTests (ko, next) {
 				_id: 1,
 				string: 'nice',
 			}, 'Instance uses assigned _id when specified and contains data')
-			return SimpleModelNumID.count({})
+			return SimpleModelNumID.countDocuments({})
 		}).then(count => {
 			t.equal(count, 1, 'Count incremented after creation')
 			t.end()
@@ -51,7 +51,7 @@ function runTests (ko, next) {
 
 		SimpleModelFail.create({}).save().then(() => {
 			t.fail('Model creation succeeded where it should have failed')
-			return SimpleModelFail.count({})
+			return SimpleModelFail.countDocuments({})
 		}).catch(fields => {
 			t.pass('Failed to save when fields were missing')
 			t.deepEqual(fields, {
@@ -60,7 +60,7 @@ function runTests (ko, next) {
 				number: undefined,
 			}, 'Got back an error object that contained the invalid fields')
 			//t.end()
-			return SimpleModelFail.count({})
+			return SimpleModelFail.countDocuments({})
 		}).then(count => {
 			t.equal(count, 0, 'No new models added to database')
 			return SimpleModelFail.create({
@@ -70,14 +70,14 @@ function runTests (ko, next) {
 			}).save()
 		}).then(() => {
 			t.fail('Model creation succeeded where it should have failed')
-			return SimpleModelFail.count({})
+			return SimpleModelFail.countDocuments({})
 		}).catch(fields => {
 			t.pass('Failed to save when a field failed validation')
 			t.deepEqual(fields, {
 				string: 'too long string',
 			}, 'Got back an error object that contained the invalid fields')
 			//t.end()
-			return SimpleModelFail.count({})
+			return SimpleModelFail.countDocuments({})
 		}).then(count => {
 			t.equal(count, 0, 'Did not add anything to the database')
 			return SimpleModelFail.create({
@@ -93,10 +93,10 @@ function runTests (ko, next) {
 			}).save()
 		}).then(() => {
 			t.fail('Model creation succeeded where it should have failed')
-			return SimpleModelFail.count({})
+			return SimpleModelFail.countDocuments({})
 		}).catch(err => {
 			t.equal(err instanceof Error, true, 'Got back an error when creating a duplicate')
-			return SimpleModelFail.count({})
+			return SimpleModelFail.countDocuments({})
 		}).then(count => {
 			t.equal(count, 1, 'Did not add anything to the database')
 			t.end()
@@ -232,7 +232,7 @@ function runTests (ko, next) {
 				field: 'zzz',
 				ref: '0',
 			}, 'Got back the saved model')
-			return ModelWithRef.count({})
+			return ModelWithRef.countDocuments({})
 		}).then(count => {
 			t.equal(count, 1, 'Saved document to the database')
 			return ModelWithRef.findOne({_id: '0'})
@@ -265,7 +265,7 @@ function runTests (ko, next) {
 				field: 'aaa',
 				ref: '1',
 			}, 'Created reference and document together')
-			return ReferencedModel.count({})
+			return ReferencedModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 2, 'Saved reference to the database')
 			return ModelWithRef.findOne({_id: '1'})
@@ -317,7 +317,7 @@ function runTests (ko, next) {
 		}).saveAll().then(doc => {
 			t.pass('Created document and embedded reference together')
 			t.equal(typeof doc.ref._id.toString(), 'string', 'Embedded document received an id')
-			return EmbeddedModel.count({_id: doc.ref._id})
+			return EmbeddedModel.countDocuments({_id: doc.ref._id})
 		})
 		.then(count => {
 			t.equal(count, 1, 'Embedded document was saved to the database')
@@ -364,7 +364,7 @@ function runTests (ko, next) {
 		}).saveAll().then(doc => {
 			t.pass('Created document and embedded reference together')
 			t.equal(typeof doc.ref._id, 'undefined', 'Embedded document did not receive an id')
-			return EmbeddedModel.count({})
+			return EmbeddedModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 0, 'Embedded document was not saved to the database')
 			return EmbedModel.findOne({_id: 0})
@@ -373,7 +373,7 @@ function runTests (ko, next) {
 			return model.saveAll()
 		}).then(model => {
 			t.equal(model.ref.string, 'Still not in the database', 'Updated document')
-			return EmbeddedModel.count({})
+			return EmbeddedModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 0, 'Embedded document was not saved to the database')
 			t.end()
@@ -458,7 +458,7 @@ function runTests (ko, next) {
 				name: 'zero',
 				refs: [0, 1],
 			}, 'Saved model')
-			return ArrayOfRefs.count({})
+			return ArrayOfRefs.countDocuments({})
 		}).then(count => {
 			t.equal(count, 1, 'Model count incremented')
 			return ArrayOfRefs.findOne({name: 'zero'})
@@ -504,7 +504,7 @@ function runTests (ko, next) {
 			})
 			return model.saveRefs()
 		}).then(() => {
-			return ReferencedModel.count({})
+			return ReferencedModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 4, 'Pushed a new reference and saved it')
 			return ReferencedModel.findOne({_id: 3})
@@ -526,10 +526,10 @@ function runTests (ko, next) {
 				name: 'three',
 				refs: [4],
 			}, 'Created new model and reference together')
-			return ArrayOfRefs.count({})
+			return ArrayOfRefs.countDocuments({})
 		}).then(count => {
 			t.equal(count, 2, 'Saved new model to the database')
-			return ReferencedModel.count({})
+			return ReferencedModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 5, 'Saved new reference to the database')
 			t.end()
@@ -578,10 +578,10 @@ function runTests (ko, next) {
 					string: '2',
 				}],
 			}, 'Saved document contained correct data')
-			return EmbedModel.count({})
+			return EmbedModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 1, 'Saved document to database')
-			return EmbeddedModel.count({})
+			return EmbeddedModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 2, 'Saved references to database')
 			return EmbedModel.create({
@@ -608,10 +608,10 @@ function runTests (ko, next) {
 					string: '4',
 				}],
 			}, 'Saved document contained correct data')
-			return EmbedModel.count({})
+			return EmbedModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 2, 'Saved document to database')
-			return EmbeddedModel.count({})
+			return EmbeddedModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 4, 'Saved references to database')
 			return EmbedModel.findOne({_id: 0})
@@ -660,10 +660,10 @@ function runTests (ko, next) {
 					string: '2',
 				}],
 			}, 'Saved document contained correct data')
-			return EmbedModel.count({})
+			return EmbedModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 1, 'Saved document to database')
-			return EmbeddedModel.count({})
+			return EmbeddedModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 0, 'Saved references to database')
 			return EmbedModel.findOne({name: 'xyz'})

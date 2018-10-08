@@ -53,7 +53,7 @@ function runTests (ko, next) {
 		}).save().then(instance => {
 			t.equal(instance.additionalValue, 'Added', 'Added value in postsave')
 		}).then(() => {
-			return HookModel.count({name: 'New value', update: 'this field was updated'})
+			return HookModel.countDocuments({name: 'New value', update: 'this field was updated'})
 		}).then(count => {
 			t.equal(count, 1, 'Saved to database with changed value')
 			return HookModel.deleteOne({name: 'New value'})

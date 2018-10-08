@@ -1,7 +1,7 @@
 const test = require('tape')
 
 function runTests (ko, next) {
-	test('Model#count', function (t) {
+	test('Model#countDocuments', function (t) {
 		const CountModel = ko.Model('ko_db_test_methods_count', {
 			name: ko.String,
 		})
@@ -12,10 +12,35 @@ function runTests (ko, next) {
 			CountModel.create({name: 'Bernie'}).save(),
 			CountModel.create({name: 'Barry'}).save(),
 		]).then(() => {
-			return CountModel.count({})
+			return CountModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 4, 'Counts all the models correctly')
-			return CountModel.count({name: 'Barry'})
+			return CountModel.countDocuments({name: 'Barry'})
+		}).then(count => {
+			t.equal(count, 2, 'Counts correctly when supplied a query')
+			t.end()
+		}).catch(err => {
+			t.error(err)
+			t.end()
+			next()
+		})
+	})
+
+	test('Model#estimatedDocumentCount', function (t) {
+		const estCountModel = ko.Model('ko_db_test_methods_est_count', {
+			name: ko.String,
+		})
+
+		Promise.all([
+			estCountModel.create({name: 'Barry'}).save(),
+			estCountModel.create({name: 'Berry'}).save(),
+			estCountModel.create({name: 'Bernie'}).save(),
+			estCountModel.create({name: 'Barry'}).save(),
+		]).then(() => {
+			return estCountModel.estimatedDocumentCount({})
+		}).then(count => {
+			t.equal(count, 4, 'Counts all the models correctly')
+			return estCountModel.estimatedDocumentCount({name: 'Barry'})
 		}).then(count => {
 			t.equal(count, 2, 'Counts correctly when supplied a query')
 			t.end()
@@ -146,22 +171,22 @@ function runTests (ko, next) {
 		]).then(models => {
 			return DeleteModel.deleteById(models[4]._id)
 		}).then(() => {
-			return DeleteModel.count({})
+			return DeleteModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 4, 'Deleted one document from the database with deleteById')
 			return DeleteModel.deleteOne({name: 'Bernie'})
 		}).then(() => {
-			return DeleteModel.count({})
+			return DeleteModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 3, 'Deleted one document from the databse with deleteOne')
 			return DeleteModel.deleteMany({name: 'Barry'})
 		}).then(() => {
-			return DeleteModel.count({})
+			return DeleteModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 1, 'Deleted two documents from the databse with deleteMany')
 			return DeleteModel.deleteMany({})
 		}).then(() => {
-			return DeleteModel.count({})
+			return DeleteModel.countDocuments({})
 		}).then(count => {
 			t.equal(count, 0, 'Deleted remaining documents by passing {} to deleteMany')
 			t.end()
