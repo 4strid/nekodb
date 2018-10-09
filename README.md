@@ -959,11 +959,23 @@ This will be supported in a later version.
 
 ## Counting models
 
-To count the number of documents matching a query, use the Model `count` method, which takes
-the same kind of query as the `find` methods. `count` returns a Promise that resolves to the
-number of models that matched the query.
+To count the number of documents matching a query, use the Model `countDocuments` or `estimatedDocumentCount` methods, which take the same kind of query as the `find` methods. The `count` method which is slated for deprecation on MongoDB is also still supported here. When using any of the 3 count methods with NeDB, the same `count` method is used. `countDocuments`, `estimatedDocumentCount` and `count` will return a Promise that resolves to the number of models that matched the query.
 
 ```javascript
+ko.models.Author.countDocuments({}).then(count => {
+    console.log(count)
+    // logs the total number of Author models
+}).catch(err => {
+    console.log(err)
+})
+
+ko.models.Author.estimatedDocumentCount({name: 'Darwood'}).then(count => {
+    console.log(count)
+    // logs the total number of Author models with name: 'Darwood' (also works on other count methods)
+}).catch(err => {
+    console.log(err)
+})
+
 ko.models.Author.count({}).then(count => {
     console.log(count)
     // logs the total number of Author models

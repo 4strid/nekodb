@@ -1,7 +1,8 @@
 const test = require('tape')
 
 function runTests (ko, next) {
-	test('Model#countDocuments', function (t) {
+
+	test('Model#count', function (t) {
 		const CountModel = ko.Model('ko_db_test_methods_count', {
 			name: ko.String,
 		})
@@ -12,10 +13,35 @@ function runTests (ko, next) {
 			CountModel.create({name: 'Bernie'}).save(),
 			CountModel.create({name: 'Barry'}).save(),
 		]).then(() => {
-			return CountModel.countDocuments({})
+			return CountModel.count({})
 		}).then(count => {
 			t.equal(count, 4, 'Counts all the models correctly')
-			return CountModel.countDocuments({name: 'Barry'})
+			return CountModel.count({name: 'Barry'})
+		}).then(count => {
+			t.equal(count, 2, 'Counts correctly when supplied a query')
+			t.end()
+		}).catch(err => {
+			t.error(err)
+			t.end()
+			next()
+		})
+	})
+
+	test('Model#countDocuments', function (t) {
+		const CountDocsModel = ko.Model('ko_db_test_methods_count_docs', {
+			name: ko.String,
+		})
+
+		Promise.all([
+			CountDocsModel.create({name: 'Barry'}).save(),
+			CountDocsModel.create({name: 'Berry'}).save(),
+			CountDocsModel.create({name: 'Bernie'}).save(),
+			CountDocsModel.create({name: 'Barry'}).save(),
+		]).then(() => {
+			return CountDocsModel.countDocuments({})
+		}).then(count => {
+			t.equal(count, 4, 'Counts all the models correctly')
+			return CountDocsModel.countDocuments({name: 'Barry'})
 		}).then(count => {
 			t.equal(count, 2, 'Counts correctly when supplied a query')
 			t.end()
