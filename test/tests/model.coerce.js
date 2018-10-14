@@ -30,7 +30,7 @@ function runTests (ko, next) {
 			t.equal(model.bool, false, 'Number value 0 is coerced to false')
 			await model.save()
 
-			const count = await BooleanModel.count({bool: false})
+			const count = await BooleanModel.countDocuments({bool: false})
 			t.equal(count, 1, 'Found the model when searching with a boolean value')
 
 			let found = await BooleanModel.findOne({bool: 'false'})
@@ -63,7 +63,7 @@ function runTests (ko, next) {
 
 			await model.save()
 
-			const count = await NumberModel.count({num: 0})
+			const count = await NumberModel.countDocuments({num: 0})
 			t.equal(count, 1, 'Found the model when searching with a number value')
 
 			let found = await NumberModel.findOne({num: '0'})
@@ -101,7 +101,7 @@ function runTests (ko, next) {
 
 			await model.save()
 
-			const count = await StringModel.count({string: '123'})
+			const count = await StringModel.countDocuments({string: '123'})
 			t.equal(count, 1, 'Found the model when searching with a string value')
 
 			let found = await StringModel.findOne({string: 123})
@@ -139,7 +139,7 @@ function runTests (ko, next) {
 
 			await model.save()
 
-			const count = await DateModel.count({date: new Date(time)})
+			const count = await DateModel.countDocuments({date: new Date(time)})
 			t.equal(count, 1, 'Found the model when searching with a date value')
 
 			let found = await DateModel.findOne({date: time})
@@ -194,7 +194,7 @@ function runTests (ko, next) {
 
 			await model.save()
 
-			const count = await ArrayModel.count({arr: [8, 5, 2, 3]})
+			const count = await ArrayModel.countDocuments({arr: [8, 5, 2, 3]})
 			t.equal(count, 1, 'Found the model when searching with an array of uncoerced values')
 
 			let found = await ArrayModel.findOne({arr: ['8', '5', '2', '3']})
@@ -336,9 +336,9 @@ function runTests (ko, next) {
 			t.equal(model.string, '123', 'Option with leading String type is coerced to string')
 			await model.save()
 
-			let count = await OptionModel.count({optional: 'null'})
+			let count = await OptionModel.countDocuments({optional: 'null'})
 			t.equal(count, 1, 'Coerced string null to null in query')
-			count = await OptionModel.count({number: '123'})
+			count = await OptionModel.countDocuments({number: '123'})
 			t.equal(count, 1, 'Coerced string to number in query')
 		} catch (err) {
 			t.error(err)
