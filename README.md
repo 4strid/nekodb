@@ -92,8 +92,8 @@ Jump To
 
 
 #### Common Hiccups
-  * [ko.Model is not a function](https://github.com/cutejs/nekodb#you-must-call-koconnect-before-creating-your-models-or-you-will-get-the-error-defined)
-  * [Program hangs on model.save()](https://github.com/cutejs/nekodb#hooks)
+  * [ko.Model is not a function](#you-must-call-koconnect-before-creating-your-models)
+  * [Program hangs on model.save()](#you-must-always-call-next)
 
 Quick Intro
 ===========
@@ -271,7 +271,9 @@ Though they are executed in order, there's no way to guarantee that they finish 
 need the results of one call in a subsequent call you should still use a Promise chain to order
 your calls.
 
-#### You must call ko.connect before creating your models or you will get the error "defined"
+### You must call ko.connect before creating your models
+Before you can create a Model, you must call ko.connect or you will get the error "ko.models is
+not a function" or "ko.Model is not a function"
 
 ## Creating schemas
 
@@ -959,7 +961,10 @@ This will be supported in a later version.
 
 ## Counting models
 
-To count the number of documents matching a query, use the Model `countDocuments` or `estimatedDocumentCount` methods, which take the same kind of query as the `find` methods. The `count` method which is slated for deprecation on MongoDB is also still supported here. When using any of the 3 count methods with NeDB, the same `count` method is used. `countDocuments`, `estimatedDocumentCount` and `count` will return a Promise that resolves to the number of models that matched the query.
+To count the number of documents matching a query, use the Model `countDocuments` or `estimatedDocumentCount` methods,
+which take the same kind of query as the `find` methods. The `count` method which is slated for deprecation on MongoDB
+is also still supported here. When using any of the 3 count methods with NeDB, the same `count` method is used.
+`countDocuments`, `estimatedDocumentCount` and `count` will return a Promise that resolves to the number of models that matched the query.
 
 ```javascript
 ko.models.Author.countDocuments({}).then(count => {
@@ -976,6 +981,8 @@ ko.models.Author.estimatedDocumentCount({name: 'Darwood'}).then(count => {
     console.log(err)
 })
 
+// (outputs a rather annoying depcrecation warning in MonogDB
+//  use countDocuments or estimatedDocumentCount instead)
 ko.models.Author.count({}).then(count => {
     console.log(count)
     // logs the total number of Author models
@@ -1016,7 +1023,8 @@ You can inject code to be run before and after certain steps of saving a model t
 Your hook will be called with two arguments: the instance and a `next()` function you call when
 you're finished with your hook. You can also return a Promise rather than call `next()`.
 
-#### You must always call next() or your program will hang when saving.
+### You must always call next()
+You must always call `next()` or return a Promise or your program will hang on saving.
 
 You can add hooks two ways. First is by including a $$hooks property on your schema when you
 define your model, where the keys are the names of the hooks to be added and the values are the
@@ -1373,6 +1381,9 @@ Changelog
 - Use deepEqual comparison when determining which elements to $pull
 ### 2.2
 - Type coersion works for option types (including optional fields)
+### 2.3
+- Updates for compatibility with latest changes to mongodb (thanks to [@xezian](https://github.com/xezian) for the PR!)
+- add `countDocuments` and `estimatedDocumentCount` methods)
 
 Testing
 -------
