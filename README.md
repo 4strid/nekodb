@@ -1190,7 +1190,9 @@ API Reference
 ### ko
 - `connect(Object config)` Connects to a backend (either NeDB or MongoDB) using supplied *config*.
 - `close()` Closes a MongoDB connection, and sets own properties to `null`.
-- `Model(Object schema)` Registers a Model and creates a collection to store it in. Returns a `Model`. *schema* has form {fieldname: typeclass, ...}
+- `Model(Object schema, \[Object options\])` Registers a Model and creates a collection to store it in. Returns a `Model`.
+  *schema* has form {fieldname: typeclass, ...}, *options* contains additional configuration for the collection (passed
+  to the client's underlying createCollection mechanic (See NeDB / MongoDB docs for collection options))
 - `models(Object schemas)` Registers multiple Models at once. *schemas* has form {modelname: {schema}, ...}
 - `models` The Models registry. The properties of this object are a way to refer to each Model that has been registered.
 - `client` The currently used backend. Either an instance of `MongoClient` (not MongoDB's MongoClient) or `NeDBClient`
@@ -1384,6 +1386,8 @@ Changelog
 ### 2.3
 - Updates for compatibility with latest changes to mongodb (thanks to [@xezian](https://github.com/xezian) for the PR!)
 - add `countDocuments` and `estimatedDocumentCount` methods)
+### 2.4
+- Add ability to pass additional configuration to NeDB Client when creating a collection (lookin at you, timestamps)
 
 Testing
 -------
